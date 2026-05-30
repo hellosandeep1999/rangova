@@ -1,0 +1,92 @@
+/* Custom resets and smooth animation classes for editorial brand experience */
+
+body {
+  margin: 0;
+  background-color: #F9F7F2; /* warm-ivory */
+  color: #1b1c1c; /* on-surface */
+  overflow-x: hidden;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Mobile menu fade-in */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fadeIn {
+  animation: fadeIn 0.22s ease-out both;
+}
+
+/* Custom scrollbars for high fidelity feel */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #F9F7F2;
+}
+::-webkit-scrollbar-thumb {
+  background: #e4e2e1;
+  border-radius: 0px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #c4c7c7;
+}
+
+/* Utility classes from prototypes */
+.carousel-slide {
+  transition: opacity 0.8s ease-in-out;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.product-card:hover .product-img-hover {
+  opacity: 1;
+}
+.product-card:hover .product-img-main {
+  opacity: 0;
+}
+.product-img {
+  transition: opacity 0.5s ease-in-out;
+}
+
+/* Accordion transition utility */
+.accordion-content {
+  transition: max-height 0.4s ease-out, opacity 0.3s ease-out;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+}
+.accordion-content.open {
+  max-height: 500px;
+  opacity: 1;
+}
+.accordion-icon {
+  transition: transform 0.3s ease;
+}
+.accordion-icon.rotated {
+  transform: rotate(180deg);
+}
+
+/* Reveal scroll effects */
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+.reveal-on-scroll.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Soft warm background representing warm ivory -->
+  <rect width="64" height="64" fill="#F9F7F2" rx="0" />
+  <!-- Elegant typography monogram R in terracotta -->
+  <text 
+    x="31" 
+    y="44" 
+    font-family="Playfair Display, Georgia, serif" 
+    font-size="38" 
+    font-weight="bold" 
+    fill="#9B3018" 
+    text-anchor="middle"
+  >R</text>
+  <!-- Minimalist accent dot representing modern Indian craft tradition -->
+  <circle cx="45" cy="20" r="3" fill="#1b1c1c" />
+</svg>
