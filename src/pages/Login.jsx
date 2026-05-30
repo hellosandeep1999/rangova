@@ -25,9 +25,12 @@ export default function Login({ navigateTo, triggerNotification, setCurrentUser 
           style={{ backgroundImage: `url('https://lh3.googleusercontent.com/aida-public/AB6AXuCGyRBDfrxA8fs3Z5pjJDqpH8BdLxOFVVH0gMJqvKbE5GvyT0M6YgBxn4s9-xrPvqnrsPtMbceXNTOASimzcmp_PCku8MT4pXYTtz2Ij7d5H9vxiYyuKddTcfVR-LFn4qbqryZSAOE4xGEuwWOl4LFJWJDx7rM2zIjy_edDJwLDiPyT_QdGuoOnVbnofCCaB5X5rq8YcKp7-MvNtCx2KGVw77hoiKCf9BGYlq80FdlcM8tGZVUzZPO06P5EQXRCDPnj5Q_HpGTTJQ')` }}
         ></div>
         <div className="absolute inset-0 bg-black/10" />
-        <div className="absolute top-10 left-10">
-          <span className="font-headline-lg text-white font-bold text-2xl tracking-tighter">RANGOVA</span>
-        </div>
+        <button 
+          onClick={() => navigateTo('home')}
+          className="absolute top-10 left-10 font-headline-lg text-white font-bold text-2xl tracking-tighter hover:opacity-80 transition-opacity bg-transparent border-none cursor-pointer"
+        >
+          RANGOVA
+        </button>
         <div className="absolute bottom-16 left-12 right-12 text-white">
           <h2 className="font-headline-xl text-[40px] text-white font-bold leading-tight mb-4 drop-shadow-sm">Crafted Heritage.</h2>
           <p className="font-body-lg text-base text-white/90 max-w-sm drop-shadow-sm leading-relaxed">Join our curated community to access exclusive collections, early arrivals, and bespoke editorial content.</p>

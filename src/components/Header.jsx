@@ -105,9 +105,9 @@ export default function Header({
             )}
           </button>
 
-          {/* Premium Account Dropdown (Desktop) */}
+          {/* Premium Account Dropdown */}
           {isProfileDropdownOpen && currentUser && (
-            <div className="hidden md:block absolute right-0 top-10 w-96 bg-white border border-outline-variant/30 shadow-2xl p-6 z-50 text-left animate-fadeIn font-body-md text-primary">
+            <div className="fixed md:absolute left-4 right-4 md:left-auto md:right-0 top-16 md:top-10 w-[calc(100vw-32px)] md:w-96 bg-white border border-outline-variant/30 shadow-2xl p-6 z-50 text-left animate-fadeIn font-body-md text-primary rounded-lg md:rounded-none">
               <div className="flex justify-between items-center border-b border-outline-variant/20 pb-4 mb-4">
                 <div>
                   <h4 className="font-headline-sm text-sm font-bold">{currentUser.name}</h4>
@@ -141,7 +141,7 @@ export default function Header({
                     <div key={order.id} className="text-xs border-b border-outline-variant/10 pb-2 last:border-b-0">
                       <div className="flex justify-between font-bold mb-1">
                         <span>{order.id}</span>
-                        <span className="text-muted-terracotta">₹{order.total.toLocaleString()}</span>
+                        <span className="text-muted-terracotta font-semibold">₹{order.total.toLocaleString()}</span>
                       </div>
                       <div className="flex justify-between text-secondary text-[11px]">
                         <span>{order.items}</span>

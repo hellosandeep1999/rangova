@@ -101,9 +101,9 @@ export default function Checkout({ cart, subtotal, navigateTo, setIsCartOpen, se
             <div className="space-y-4 max-h-[280px] overflow-y-auto pr-2">
               {cart.map((item, index) => (
                 <div key={index} className="flex items-center gap-3">
-                  <div className="relative w-14 h-18 bg-surface-container-low flex-shrink-0">
+                  <div className="relative w-14 h-16 bg-surface-container-low flex-shrink-0 overflow-visible mt-2">
                     <img src={item.image} alt={item.title} className="w-14 h-16 object-cover" />
-                    <span className="absolute -top-2 -right-2 bg-secondary text-white w-5 h-5 flex items-center justify-center rounded-full font-label-caps text-[10px]">{item.quantity}</span>
+                    <span className="absolute -top-2.5 -right-2.5 bg-muted-terracotta text-white w-5 h-5 flex items-center justify-center rounded-full font-label-caps text-[10px] font-bold shadow-sm z-10">{item.quantity}</span>
                   </div>
                   <div className="flex-grow">
                     <h3 className="text-sm font-bold text-primary leading-snug">{item.title}</h3>

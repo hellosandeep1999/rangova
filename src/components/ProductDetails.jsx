@@ -24,6 +24,8 @@ export default function ProductDetails({ navigateTo, addToCart, selectedProductI
     if (carouselRef.current) {
       carouselRef.current.scrollLeft = 0;
     }
+    // Smoothly scroll the window to the top so the user sees the newly selected product
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [selectedProductId, prod]);
 
   // Sync image index when color changes
@@ -198,8 +200,8 @@ export default function ProductDetails({ navigateTo, addToCart, selectedProductI
               {prod.badge && (
                 <span className="bg-soft-beige px-3 py-1 font-label-caps text-[9px] text-primary uppercase tracking-widest mb-3 inline-block font-bold">{prod.badge}</span>
               )}
-              {/* Clean elegant serif product title */}
-              <h1 className="font-display-lg text-[28px] md:text-[38px] text-primary mb-3 leading-tight tracking-tight font-bold uppercase">{prod.title}</h1>
+              {/* Clean elegant serif product title - sized smaller for premium style */}
+              <h1 className="font-display-lg text-[22px] md:text-[30px] text-primary mb-2.5 leading-snug tracking-tight font-bold uppercase">{prod.title}</h1>
               
               {/* Premium pricing display with market crossed-out original price */}
               <div className="flex items-baseline gap-3 mt-2">
@@ -306,11 +308,11 @@ export default function ProductDetails({ navigateTo, addToCart, selectedProductI
       </div>
 
       {/* Recommendations Carousel (Related Products) */}
-      <section className="mt-16 border-t border-outline-variant/20 pt-12">
-        <div className="flex justify-between items-end mb-8">
+      <section className="mt-8 border-t border-outline-variant/20 pt-8">
+        <div className="flex justify-between items-end mb-6">
           <div>
             <span className="font-label-caps text-[9px] text-muted-terracotta tracking-[0.25em] uppercase mb-1.5 block">Complete the look</span>
-            <h2 className="font-display-lg text-2xl md:text-3xl font-bold tracking-tight text-primary uppercase">You May Also Love</h2>
+            <h2 className="font-display-lg text-xl md:text-2xl font-bold tracking-tight text-primary uppercase">You May Also Love</h2>
           </div>
           <span className="text-[10px] text-secondary font-label-caps tracking-widest hidden md:inline-block uppercase opacity-75">Swipe to explore →</span>
         </div>
@@ -320,7 +322,9 @@ export default function ProductDetails({ navigateTo, addToCart, selectedProductI
           {recommendations.map(item => (
             <div
               key={item.id}
-              onClick={() => viewProductDetails(item.id)}
+              onClick={() => {
+                viewProductDetails(item.id);
+              }}
               className="w-[180px] md:w-[260px] min-w-[180px] md:min-w-[260px] snap-start cursor-pointer group text-left"
             >
               <div className="relative aspect-[3/4] overflow-hidden bg-surface-container-low mb-3">
@@ -340,6 +344,20 @@ export default function ProductDetails({ navigateTo, addToCart, selectedProductI
                   <span className="text-[10px] md:text-xs text-secondary line-through opacity-50">₹{item.originalPrice.toLocaleString()}</span>
                 )}
               </div>
+              
+              {/* Show available color swatches */}
+              {item.colorsHex && (
+                <div className="flex gap-1.5 mt-2">
+                  {Object.entries(item.colorsHex).map(([colName, hex]) => (
+                    <span 
+                      key={colName} 
+                      title={colName}
+                      className="w-2.5 h-2.5 rounded-full border border-outline/20 flex-shrink-0 inline-block shadow-sm" 
+                      style={{ backgroundColor: hex }} 
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           ))}
         </div>

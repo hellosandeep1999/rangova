@@ -47,14 +47,24 @@ const TESTIMONIALS = [
   }
 ];
 
-// Fashion reels using product/editorial images as stand-ins
+// Fashion reels using auto-play looping videos (portrait 9:16)
+// Using Pexels free CDN videos (CC0 / royalty-free)
 const FASHION_REELS = [
-  { img: 'https://lh3.googleusercontent.com/aida/ADBb0ujAjO9m4OGgOq5HF3cEpj9iGOrNxw7RIyA7jIFL27ZLD2_kOJqMeGmRSYEEh59Iw2v01p2AniOFoKwtwIlX7EEfXdOL1t6fMn8AjTQSwnElCzIM5ducSFY3boNvKu4aXhtf_04OEBuoNYX8ZegRMqq3cDIXLRHS_5ZZFSagLsAx7G_8AbBCAsD4tZwK8QRENosdutf6s94dBnNDO1g7gHo1nBJBJEJM9KFBS6-dQatcG2ddQJApN_ij', label: 'Emerald Co-ords' },
-  { img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAuNw8hYoPckUEXbG1HurK3uNM3wR7cxf3-bytxiD-n9GjebK5kK5BaEEj1hmExCSi7fCh3zj96WwQYd9WjKSk4iGI112LaFgpplgQqiIjVW1fNDJhra9mBHlTwvfxf6ZNolxteYCDcqVq98c9_kFo6IO2ZjEbvHeFyVZC37me6TAEFtm8s80GwypZENuqWFefTcG0jobmWHxhWON9Se9zPDy8Hflk3kpJRvTY_pFEEyQeu_6RS3tRjKrW-pLFbbludN0h1uyNp0Q', label: 'Silk Trench Walk' },
-  { img: 'https://lh3.googleusercontent.com/aida/ADBb0ugYGboZgWz32IDgG53pkXDhgNdUZFaFOjcja6nLntZTykYzrg8QrY9SJnZm1ii8aCHkjSv1IS0-trIE7HD27TsZRcwwAPQlBmzPZaMkHlIgZ8oo98o3YWsNbfqnS73ZtVxa9bOOLEZYdFjBqH3MD5skpPthtRQKx-4wlPRxPcHQ4WFqeFGrssrCnRmcuxXJmCLIaJ6XhZqDI7meNZWkp-wNg0lFQ78LuFmzay7xd6CDcHYKed2QVrD9', label: 'Summer Dress' },
-  { img: 'https://lh3.googleusercontent.com/aida/ADBb0uhM6Pq6vNQH2-aiTRcQNt1HTfmCIfolJs5WvRnRPCPcLGATDpsu7jjYK0GiLiLEMsjAb0AeJ-DRGIOdWAXsQ9hFdp1sCgHERVw5uOEnLmW67zDH55sKWMsuJ1ds6g84YJ0wECPAsRfPdo3Pi8cX4SGCFqr2qki2oHe587igji9tKX3vIU0aARxiTRBfzpfyoVdTaGWH2z-hpBhytnOO82IUYgQuL53YtRLBkdGgRhkDZiiyPbErAEi8LQ', label: 'Tiered Skirt' },
-  { img: 'https://lh3.googleusercontent.com/aida/ADBb0ugjDUxBKpvtbeftQMJvQjNkJA9T8YwSfO1hnezXA57ehNdRXVwuoANKG_VxBlRWsJ41-WZeQg1GnEJ4uSVWSmeTEw-skEkgRZzBCrQBrUE3eLRPwTEUD9X22aGU6saxZCz9kdYwnXwdP15IZeW1eSnW_Vr1Eyi-vPnRM3w7o9OVyAL6niv4RcElvJqEeh8kGN1W9tEr6roqE9v0CCnnpI1Rvte5_n0-wMH8h-BUhYXRyXJpgK5w830G2w', label: 'Classic Tops' },
-  { img: 'https://lh3.googleusercontent.com/aida/ADBb0uhHH7mxDCG7lrhSujAhShHknl1mly9T_I-5RQ54mlttUqaFGv4MaNIDzQD_cipBnsfot0gxJXwq0evVgfsYZeJG1nlJcEDheRPqPRYHL2rlOqH4z-fjXnUGS8BksaDh59BWRvbekkqH178KNDnOe0OL7WbDaSNsVGam1MTiXwNBFxKgiyk7hKAl_pmCRDfVObkAonP8qufWzoGRtvyR3oGZ9oWb9Fu3TkWm4NcMRpn2fCfLhueD-93MtQ', label: 'Indigo Prints' },
+  { src: 'https://videos.pexels.com/video-files/7214090/7214090-sd_360_640_25fps.mp4', label: 'Block Print Walk' },
+  { src: 'https://videos.pexels.com/video-files/8285503/8285503-sd_360_640_25fps.mp4', label: 'Silk Trench' },
+  { src: 'https://videos.pexels.com/video-files/6389087/6389087-sd_360_640_25fps.mp4', label: 'Summer Collection' },
+  { src: 'https://videos.pexels.com/video-files/6231808/6231808-sd_360_640_25fps.mp4', label: 'Tiered Skirt' },
+  { src: 'https://videos.pexels.com/video-files/5386771/5386771-sd_360_640_25fps.mp4', label: 'Studio Prep' },
+  { src: 'https://videos.pexels.com/video-files/4754961/4754961-sd_360_640_25fps.mp4', label: 'Heritage Craft' },
+];
+
+const TEAM_REELS = [
+  { src: 'https://videos.pexels.com/video-files/4098942/4098942-sd_360_640_25fps.mp4', label: 'Artisan Dyeing' },
+  { src: 'https://videos.pexels.com/video-files/4098940/4098940-sd_360_640_25fps.mp4', label: 'Block Printing' },
+  { src: 'https://videos.pexels.com/video-files/3687757/3687757-sd_360_640_25fps.mp4', label: 'Loom Weaving' },
+  { src: 'https://videos.pexels.com/video-files/4098943/4098943-sd_360_640_25fps.mp4', label: 'Finishing Touches' },
+  { src: 'https://videos.pexels.com/video-files/4098941/4098941-sd_360_640_25fps.mp4', label: 'Quality Check' },
+  { src: 'https://videos.pexels.com/video-files/4098942/4098942-sd_360_640_25fps.mp4', label: 'Packing & Care' },
 ];
 
 export default function Home({ navigateTo, setCategoryFilter, addToCart, PRODUCTS, viewProductDetails }) {
@@ -242,7 +252,7 @@ export default function Home({ navigateTo, setCategoryFilter, addToCart, PRODUCT
         </div>
       </section>
 
-      {/* ── Fashion Reels Section (new, scrollable, no buttons) ── */}
+      {/* ── Fashion Reels Section — auto-playing looping vertical video tiles ── */}
       <section className="py-10 md:py-14 bg-warm-ivory">
         <div className="px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto mb-6">
           <span className="font-label-caps text-[10px] text-muted-terracotta tracking-[0.25em] uppercase mb-2 block">Style in Motion</span>
@@ -256,28 +266,66 @@ export default function Home({ navigateTo, setCategoryFilter, addToCart, PRODUCT
           {FASHION_REELS.map((reel, i) => (
             <div
               key={i}
-              className="relative flex-shrink-0 snap-start cursor-pointer group overflow-hidden"
+              className="relative flex-shrink-0 snap-start overflow-hidden group"
               style={{ width: '150px', minWidth: '138px' }}
             >
-              <div className="relative aspect-[9/16] overflow-hidden">
-                <img
-                  alt={reel.label}
-                  className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
-                  src={reel.img}
+              <div className="relative rounded-lg overflow-hidden" style={{ aspectRatio: '9/16' }}>
+                <video
+                  src={reel.src}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-full h-full object-cover object-center"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent" />
-                {/* Play button */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-10 h-10 bg-white/25 backdrop-blur-sm flex items-center justify-center rounded-full group-hover:bg-white/45 group-hover:scale-110 transition-all duration-300">
-                    <span className="material-symbols-outlined text-white text-[22px]" style={{ fontVariationSettings: "'FILL' 1" }}>play_arrow</span>
-                  </div>
-                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/5 to-transparent" />
                 <div className="absolute bottom-3 left-2.5 right-2.5">
                   <p className="font-label-caps text-[9px] text-white tracking-wider uppercase leading-tight">{reel.label}</p>
                 </div>
               </div>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* ── Team Working Reels — continuously scrolling marquee ── */}
+      <section className="py-10 md:py-12 bg-primary overflow-hidden">
+        <div className="px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto mb-6">
+          <span className="font-label-caps text-[10px] text-dusty-gold tracking-[0.25em] uppercase mb-2 block">Behind the Craft</span>
+          <h2 className="font-headline-xl text-[24px] md:text-[38px] text-white">Team Working Reels</h2>
+        </div>
+
+        {/* Infinite-scroll marquee — duplicated for seamless loop */}
+        <div className="flex overflow-hidden" aria-hidden="true">
+          <div
+            className="flex gap-3 flex-shrink-0"
+            style={{
+              animation: 'marqueeScroll 28s linear infinite',
+            }}
+          >
+            {[...TEAM_REELS, ...TEAM_REELS].map((reel, i) => (
+              <div
+                key={i}
+                className="relative flex-shrink-0 overflow-hidden rounded-lg"
+                style={{ width: '130px', minWidth: '130px' }}
+              >
+                <div className="relative" style={{ aspectRatio: '9/16' }}>
+                  <video
+                    src={reel.src}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="w-full h-full object-cover object-center"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+                  <div className="absolute bottom-3 left-2.5 right-2.5">
+                    <p className="font-label-caps text-[8px] text-white/90 tracking-wider uppercase leading-tight">{reel.label}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 

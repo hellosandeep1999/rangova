@@ -4,12 +4,20 @@ export default function Shop({ PRODUCTS, navigateTo, addToCart, viewProductDetai
   const [categoryFilter, setCategoryFilter] = useState('All');
   const [searchFilter, setSearchFilter] = useState('');
   const [sortOrder, setSortOrder] = useState('Featured');
+  const [showInStock, setShowInStock] = useState(true);
+  const [showOutOfStock, setShowOutOfStock] = useState(true);
+
+  const inStockCount = PRODUCTS.filter(p => p.inStock !== false).length;
+  const outOfStockCount = PRODUCTS.filter(p => p.inStock === false).length;
 
   const filtered = PRODUCTS
-    .filter(p =>
-      (categoryFilter === 'All' || p.category === categoryFilter) &&
-      p.title.toLowerCase().includes(searchFilter.toLowerCase())
-    )
+    .filter(p => {
+      const categoryMatch = categoryFilter === 'All' || p.category === categoryFilter;
+      const titleMatch = p.title.toLowerCase().includes(searchFilter.toLowerCase());
+      const isInStock = p.inStock !== false;
+      const availabilityMatch = (isInStock && showInStock) || (!isInStock && showOutOfStock);
+      return categoryMatch && titleMatch && availabilityMatch;
+    })
     .sort((a, b) => {
       if (sortOrder === 'Price: Low to High') return a.price - b.price;
       if (sortOrder === 'Price: High to Low') return b.price - a.price;
@@ -38,19 +46,36 @@ export default function Shop({ PRODUCTS, navigateTo, addToCart, viewProductDetai
         {/* Sidebar */}
         <aside className="w-full lg:w-56 flex-shrink-0">
           <div className="space-y-6 lg:sticky lg:top-28">
+            {/* Availability Filter */}
             <div>
               <h3 className="font-headline-sm text-base font-bold text-primary mb-3">Availability</h3>
               <div className="space-y-2">
-                <label className="flex items-center gap-3 cursor-pointer text-sm">
-                  <input type="checkbox" defaultChecked className="rounded-none" />
-                  <span>In Stock (38)</span>
+                <label className="flex items-center gap-3 cursor-pointer text-sm group">
+                  <input
+                    type="checkbox"
+                    checked={showInStock}
+                    onChange={e => setShowInStock(e.target.checked)}
+                    className="rounded-none w-4 h-4 cursor-pointer accent-current"
+                  />
+                  <span className="group-hover:text-primary transition-colors">
+                    In Stock <span className="text-secondary text-xs">({inStockCount})</span>
+                  </span>
                 </label>
-                <label className="flex items-center gap-3 cursor-pointer text-sm">
-                  <input type="checkbox" className="rounded-none" />
-                  <span>Out of Stock (3)</span>
+                <label className="flex items-center gap-3 cursor-pointer text-sm group">
+                  <input
+                    type="checkbox"
+                    checked={showOutOfStock}
+                    onChange={e => setShowOutOfStock(e.target.checked)}
+                    className="rounded-none w-4 h-4 cursor-pointer accent-current"
+                  />
+                  <span className="group-hover:text-primary transition-colors">
+                    Out of Stock <span className="text-secondary text-xs">({outOfStockCount})</span>
+                  </span>
                 </label>
               </div>
             </div>
+
+            {/* Refine Search */}
             <div>
               <h3 className="font-headline-sm text-base font-bold text-primary mb-3">Refine Search</h3>
               <input
@@ -84,47 +109,72 @@ export default function Shop({ PRODUCTS, navigateTo, addToCart, viewProductDetai
             </div>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-8 md:gap-x-6">
-            {filtered.map(prod => (
-              <div
-                key={prod.id}
-                onClick={() => {
-                  viewProductDetails(prod.id);
-                }}
-                className="group cursor-pointer text-left"
+          {filtered.length === 0 ? (
+            <div className="text-center py-24 space-y-3">
+              <span className="material-symbols-outlined text-4xl text-secondary/40">inventory_2</span>
+              <p className="font-label-caps text-xs text-secondary uppercase tracking-widest">No products match your filters</p>
+              <button
+                onClick={() => { setCategoryFilter('All'); setShowInStock(true); setShowOutOfStock(true); setSearchFilter(''); }}
+                className="text-xs text-muted-terracotta underline hover:opacity-70 font-semibold bg-transparent border-none cursor-pointer"
               >
-                <div className="relative aspect-[3/4] overflow-hidden mb-3 bg-surface-container-low">
-                  <img alt={prod.title} src={prod.imageMain} className="product-img product-img-main absolute inset-0 w-full h-full object-cover object-top z-10" />
-                  <img alt={prod.title} src={prod.imageHover} className="product-img product-img-hover absolute inset-0 w-full h-full object-cover object-top z-0 opacity-0" />
-                  {prod.badge && (
-                    <div className="absolute top-2 left-2 z-20">
-                      <span className="bg-soft-beige px-2 py-0.5 font-label-caps text-[9px] text-primary uppercase tracking-widest">{prod.badge}</span>
-                    </div>
-                  )}
-                  {/* Always-visible add button */}
-                  <button
-                    onClick={e => { e.stopPropagation(); addToCart(prod, prod.sizes?.[0] || 'S', prod.colors?.[0] || ''); }}
-                    className="absolute bottom-2 right-2 z-20 w-8 h-8 bg-primary text-white flex items-center justify-center hover:bg-muted-terracotta transition-colors duration-200 shadow border-none"
-                    title="Quick Add"
+                Reset all filters
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-8 md:gap-x-6">
+              {filtered.map(prod => {
+                const isOutOfStock = prod.inStock === false;
+                return (
+                  <div
+                    key={prod.id}
+                    onClick={() => {
+                      if (!isOutOfStock) viewProductDetails(prod.id);
+                    }}
+                    className={`group text-left ${isOutOfStock ? 'cursor-not-allowed' : 'cursor-pointer'}`}
                   >
-                    <span className="material-symbols-outlined text-[18px]">add</span>
-                  </button>
-                </div>
-                <h3 className="font-body-md text-[13px] md:text-[14px] text-primary mb-1 group-hover:text-muted-terracotta transition-colors leading-snug">{prod.title}</h3>
-                <div className="flex items-center gap-2 mb-1.5">
-                  <span className="font-price-lg text-[14px] text-primary">₹{prod.price.toLocaleString()}</span>
-                  {prod.originalPrice && <span className="text-[11px] text-secondary line-through">₹{prod.originalPrice.toLocaleString()}</span>}
-                </div>
-                {prod.colorsHex && (
-                  <div className="flex gap-1.5 items-center flex-wrap">
-                    {Object.entries(prod.colorsHex).map(([name, hex]) => (
-                      <span key={name} title={name} className="w-3 h-3 rounded-full border border-outline/30 inline-block" style={{ backgroundColor: hex }} />
-                    ))}
+                    <div className={`relative aspect-[3/4] overflow-hidden mb-3 bg-surface-container-low ${isOutOfStock ? 'opacity-55' : ''}`}>
+                      <img alt={prod.title} src={prod.imageMain} className="product-img product-img-main absolute inset-0 w-full h-full object-cover object-top z-10" />
+                      <img alt={prod.title} src={prod.imageHover} className="product-img product-img-hover absolute inset-0 w-full h-full object-cover object-top z-0 opacity-0" />
+                      {prod.badge && (
+                        <div className="absolute top-2 left-2 z-20">
+                          <span className="bg-soft-beige px-2 py-0.5 font-label-caps text-[9px] text-primary uppercase tracking-widest">{prod.badge}</span>
+                        </div>
+                      )}
+                      {/* Out of Stock overlay badge */}
+                      {isOutOfStock ? (
+                        <div className="absolute inset-0 flex items-center justify-center z-20">
+                          <span className="bg-white/90 text-primary font-label-caps text-[9px] uppercase tracking-widest px-4 py-1.5 border border-outline-variant/30">
+                            Out of Stock
+                          </span>
+                        </div>
+                      ) : (
+                        /* Quick-add button — only for in-stock items */
+                        <button
+                          onClick={e => { e.stopPropagation(); addToCart(prod, prod.sizes?.[0] || 'S', prod.colors?.[0] || ''); }}
+                          className="absolute bottom-2 right-2 z-20 w-8 h-8 bg-primary text-white flex items-center justify-center hover:bg-muted-terracotta transition-colors duration-200 shadow border-none"
+                          title="Quick Add"
+                        >
+                          <span className="material-symbols-outlined text-[18px]">add</span>
+                        </button>
+                      )}
+                    </div>
+                    <h3 className={`font-body-md text-[13px] md:text-[14px] text-primary mb-1 transition-colors leading-snug ${!isOutOfStock ? 'group-hover:text-muted-terracotta' : 'opacity-60'}`}>{prod.title}</h3>
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <span className={`font-price-lg text-[14px] ${isOutOfStock ? 'text-secondary line-through' : 'text-primary'}`}>₹{prod.price.toLocaleString()}</span>
+                      {prod.originalPrice && <span className="text-[11px] text-secondary line-through">₹{prod.originalPrice.toLocaleString()}</span>}
+                    </div>
+                    {prod.colorsHex && (
+                      <div className="flex gap-1.5 items-center flex-wrap">
+                        {Object.entries(prod.colorsHex).map(([name, hex]) => (
+                          <span key={name} title={name} className="w-3 h-3 rounded-full border border-outline/30 inline-block" style={{ backgroundColor: hex }} />
+                        ))}
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-            ))}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -10,6 +10,8 @@ import Search from './pages/Search';
 import OurStory from './pages/OurStory';
 import Login from './pages/Login';
 import Checkout from './pages/Checkout';
+import Contact from './pages/Contact';
+import Policies from './pages/Policies';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
@@ -159,6 +161,12 @@ function App() {
         )}
         {currentPage === 'login' && (
           <Login navigateTo={navigateTo} triggerNotification={triggerNotification} setCurrentUser={setCurrentUser} />
+        )}
+        {currentPage === 'contact' && (
+          <Contact navigateTo={navigateTo} triggerNotification={triggerNotification} currentUser={currentUser} />
+        )}
+        {currentPage === 'policies' && (
+          <Policies navigateTo={navigateTo} />
         )}
         {currentPage === 'checkout' && (
           <Checkout
