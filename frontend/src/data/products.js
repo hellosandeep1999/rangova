@@ -36,6 +36,7 @@ export const PRODUCTS = [
     id: 'rosewood-set',
     title: 'Rosewood Silk Kurta Set',
     price: 1199,
+    originalPrice: 1699,
     category: 'Co-ords',
     imageMain: 'https://lh3.googleusercontent.com/aida/ADBb0uiD_nOkBBJWL-TXpbC9HQyama8ZledSD8FGuZNiyTp5nfW42B2Bp4SXCYup13TfEtyaeOwPgdMTBdxS1MDKKAn8C7hjxAl7R4gJ6VgUlAhUsfLC1gznbdvx0OLsh_ZvJ36Ipz6gnULGQ5OV2JcDSgCjLehbwdr94u2ZcQVuBTlagbs8Ss8Sw7l28KbMjXp_kA_w1olNpog0SOiReFO_tffuCzXshLYcyGm6omwQUpzz9hIn9EZXnbwugA',
     imageHover: 'https://lh3.googleusercontent.com/aida/ADBb0ujAjO9m4OGgOq5HF3cEpj9iGOrNxw7RIyA7jIFL27ZLD2_kOJqMeGmRSYEEh59Iw2v01p2AniOFoKwtwIlX7EEfXdOL1t6fMn8AjTQSwnElCzIM5ducSFY3boNvKu4aXhtf_04OEBuoNYX8ZegRMqq3cDIXLRHS_5ZZFSagLsAx7G_8AbBCAsD4tZwK8QRENosdutf6s94dBnNDO1g7gHo1nBJBJEJM9KFBS6-dQatcG2ddQJApN_ij',
@@ -63,6 +64,7 @@ export const PRODUCTS = [
     id: 'indigo-skirt',
     title: 'Indigo Tiered Skirt',
     price: 899,
+    originalPrice: 1199,
     category: 'Skirts',
     imageMain: 'https://lh3.googleusercontent.com/aida/ADBb0uhM6Pq6vNQH2-aiTRcQNt1HTfmCIfolJs5WvRnRPCPcLGATDpsu7jjYK0GiLiLEMsjAb0AeJ-DRGIOdWAXsQ9hFdp1sCgHERVw5uOEnLmW67zDH55sKWMsuJ1ds6g84YJ0wECPAsRfPdo3Pi8cX4SGCFqr2qki2oHe587igji9tKX3vIU0aARxiTRBfzpfyoVdTaGWH2z-hpBhytnOO82IUYgQuL53YtRLBkdGgRhkDZiiyPbErAEi8LQ',
     imageHover: 'https://lh3.googleusercontent.com/aida/ADBb0ugjDUxBKpvtbeftQMJvQjNkJA9T8YwSfO1hnezXA57ehNdRXVwuoANKG_VxBlRWsJ41-WZeQg1GnEJ4uSVWSmeTEw-skEkgRZzBCrQBrUE3eLRPwTEUD9X22aGU6saxZCz9kdYwnXwdP15IZeW1eSnW_Vr1Eyi-vPnRM3w7o9OVyAL6niv4RcElvJqEeh8kGN1W9tEr6roqE9v0CCnnpI1Rvte5_n0-wMH8h-BUhYXRyXJpgK5w830G2w',
@@ -83,13 +85,14 @@ export const PRODUCTS = [
         'https://lh3.googleusercontent.com/aida/ADBb0uhM6Pq6vNQH2-aiTRcQNt1HTfmCIfolJs5WvRnRPCPcLGATDpsu7jjYK0GiLiLEMsjAb0AeJ-DRGIOdWAXsQ9hFdp1sCgHERVw5uOEnLmW67zDH55sKWMsuJ1ds6g84YJ0wECPAsRfPdo3Pi8cX4SGCFqr2qki2oHe587igji9tKX3vIU0aARxiTRBfzpfyoVdTaGWH2z-hpBhytnOO82IUYgQuL53YtRLBkdGgRhkDZiiyPbErAEi8LQ'
       ]
     },
-    inStock: false, // Let's make this Out of Stock to test filter!
-    description: 'Beautiful indigo dyed tired skirt featuring hand block print designs. Pairs perfectly with absolute comfort.'
+    inStock: true,
+    description: 'Beautiful indigo dyed tiered skirt featuring hand block print designs. Pairs perfectly with flowy tops.'
   },
   {
     id: 'jaipur-trench',
     title: 'The Jaipur Silk Trench',
     price: 1299,
+    originalPrice: 1899,
     category: 'Dresses',
     imageMain: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAuNw8hYoPckUEXbG1HurK3uNM3wR7cxf3-bytxiD-n9GjebK5kK5BaEEj1hmExCSi7fCh3zj96WwQYd9WjKSk4iGI112LaFgpplgQqiIjVW1fNDJhra9mBHlTwvfxf6ZNolxteYCDcqVq98c9_kFo6IO2ZjEbvHeFyVZC37me6TAEFtm8s80GwypZENuqWFefTcG0jobmWHxhWON9Se9zPDy8Hflk3kpJRvTY_pFEEyQeu_6RS3tRjKrW-pLFbbludN0h1uyNp0Q',
     imageHover: 'https://lh3.googleusercontent.com/aida-public/AB6AXuArhLFfeuhdATHykAestXFu_ZJTupIeB0puI2deOD-XT99JiBrTLpIIcczkcuiYlg0svGmaVucpvefYqZua6Bv8-fW4EMb6_y2XGEI54-1b-hmYlPekH9t7jPUBAsMrMLQ_3JNfIuU2_xkdcoSsrVF-jlU66cjGoCbg_C4UgwQbzQBF1OOI9l4fdw6ujI1qRQrA6liGgE2ufN05dAelHRRIfPhMl2_x0dGMTa0ROJ4x89S60l_A1prNGMS9KG1bwi-5oyzcNUudIQ',
@@ -122,6 +125,7 @@ export const PRODUCTS = [
     id: 'indigo-shirt',
     title: 'Indigo Block Print Shirt',
     price: 949,
+    originalPrice: 1349,
     category: 'Shirts',
     imageMain: 'https://lh3.googleusercontent.com/aida/ADBb0uhHH7mxDCG7lrhSujAhShHknl1mly9T_I-5RQ54mlttUqaFGv4MaNIDzQD_cipBnsfot0gxJXwq0evVgfsYZeJG1nlJcEDheRPqPRYHL2rlOqH4z-fjXnUGS8BksaDh59BWRvbekkqH178KNDnOe0OL7WbDaSNsVGam1MTiXwNBFxKgiyk7hKAl_pmCRDfVObkAonP8qufWzoGRtvyR3oGZ9oWb9Fu3TkWm4NcMRpn2fCfLhueD-93MtQ',
     imageHover: 'https://lh3.googleusercontent.com/aida/ADBb0ujciYT9G4QBS6Ks4QCwx1Y_rD6deFapHwkeWVsS2sbIvItuHcNL4VWmIKYu7ovhuftg5soKASwNkUDR-dqAhDvZADvCcj0sJ2gTDc7F-_wNx3btN4Wo7sZ96sA9cOlZAT-gMlHYKf3CpfGYqcPFw9Jh16F6SI06-JChalZ5B1gpfSYG7KKW8eWQ2XrotVFpzxB0_gU52miORT-FvFqWQMVnMKK77K2VgMU8cQVijiCCmEg1hCUGmmPG3Q',
@@ -144,6 +148,7 @@ export const PRODUCTS = [
     id: 'terracotta-skirt',
     title: 'Terracotta Tiered Skirt',
     price: 1049,
+    originalPrice: 1449,
     category: 'Skirts',
     imageMain: 'https://lh3.googleusercontent.com/aida/ADBb0ujciYT9G4QBS6Ks4QCwx1Y_rD6deFapHwkeWVsS2sbIvItuHcNL4VWmIKYu7ovhuftg5soKASwNkUDR-dqAhDvZADvCcj0sJ2gTDc7F-_wNx3btN4Wo7sZ96sA9cOlZAT-gMlHYKf3CpfGYqcPFw9Jh16F6SI06-JChalZ5B1gpfSYG7KKW8eWQ2XrotVFpzxB0_gU52miORT-FvFqWQMVnMKK77K2VgMU8cQVijiCCmEg1hCUGmmPG3Q',
     imageHover: 'https://lh3.googleusercontent.com/aida/ADBb0uh_20mWET2r2RcBNYNFaKduKuVBR7soKlIY4ZuF3jMFJjjQSRUd6XEReKT3lHuDz_rGl6-cc_Nhhw2WIIlAetsVxwWEDvO7hyJ11G2BlhfAvAvCR45EKMXaGzYK84J9alMFe3a5Kgxkb2rhllrqmatIfbGODr5YX8xWVVBLh-QFB6tu-ZBAuh8Ktsk4FVyZ3KxN6A8klTrrkAzZdaYotAXCZnhwBtDCrkvvek3lBpkWGHHnOxPhRqUHxQ',
@@ -159,13 +164,14 @@ export const PRODUCTS = [
         'https://lh3.googleusercontent.com/aida/ADBb0uh_20mWET2r2RcBNYNFaKduKuVBR7soKlIY4ZuF3jMFJjjQSRUd6XEReKT3lHuDz_rGl6-cc_Nhhw2WIIlAetsVxwWEDvO7hyJ11G2BlhfAvAvCR45EKMXaGzYK84J9alMFe3a5Kgxkb2rhllrqmatIfbGODr5YX8xWVVBLh-QFB6tu-ZBAuh8Ktsk4FVyZ3KxN6A8klTrrkAzZdaYotAXCZnhwBtDCrkvvek3lBpkWGHHnOxPhRqUHxQ'
       ]
     },
-    inStock: false, // Let's make this Out of Stock to test filter!
+    inStock: true,
     description: 'Flowy, tiered terracotta skirt with elegant rustic aesthetic.'
   },
   {
     id: 'peach-coord',
     title: 'Peach Floral Co-ord Set',
     price: 1149,
+    originalPrice: 1649,
     category: 'Co-ords',
     imageMain: 'https://lh3.googleusercontent.com/aida/ADBb0uj6jghwCIHBfIEkkRN58tAqA8sFXjmmZ0o0ed9s2mQ4XOeE-GtuVBYXz6Hn-55n-sVUd7xUdMRAf0MCmBCEi7ygxvZX6ciECSq4v50Xk-acp_PDB_lM3Rt3dqCKraMBCGdI7ycqLahSZjq6T_vEIeS6bPOsTGTd2pbEd1QbSoKQGPWShc9vzSBZmRNTIcSZkMZ2no9C8MXtN5ELwRWzEzmgzs9ONzvm8kz-5Gb61U6r4KGJBFySmr46Qg',
     imageHover: 'https://lh3.googleusercontent.com/aida/ADBb0ugYGboZgWz32IDgG53pkXDhgNdUZFaFOjcja6nLntZTykYzrg8QrY9SJnZm1ii8aCHkjSv1IS0-trIE7HD27TsZRcwwAPQlBmzPZaMkHlIgZ8oo98o3YWsNbfqnS73ZtVxa9bOOLEZYdFjBqH3MD5skpPthtRQKx-4wlPRxPcHQ4WFqeFGrssrCnRmcuxXJmCLIaJ6XhZqDI7meNZWkp-wNg0lFQ78LuFmzay7xd6CDcHYKed2QVrD9',
@@ -183,5 +189,131 @@ export const PRODUCTS = [
     },
     inStock: true,
     description: 'Lovely peach floral block print co-ord set for everyday elegance.'
+  },
+  {
+    id: 'ivory-top',
+    title: 'Ivory Hand-Woven Top',
+    price: 799,
+    originalPrice: 1099,
+    category: 'Tops',
+    imageMain: 'https://lh3.googleusercontent.com/aida/ADBb0ugjDUxBKpvtbeftQMJvQjNkJA9T8YwSfO1hnezXA57ehNdRXVwuoANKG_VxBlRWsJ41-WZeQg1GnEJ4uSVWSmeTEw-skEkgRZzBCrQBrUE3eLRPwTEUD9X22aGU6saxZCz9kdYwnXwdP15IZeW1eSnW_Vr1Eyi-vPnRM3w7o9OVyAL6niv4RcElvJqEeh8kGN1W9tEr6roqE9v0CCnnpI1Rvte5_n0-wMH8h-BUhYXRyXJpgK5w830G2w',
+    imageHover: 'https://lh3.googleusercontent.com/aida/ADBb0uhM6Pq6vNQH2-aiTRcQNt1HTfmCIfolJs5WvRnRPCPcLGATDpsu7jjYK0GiLiLEMsjAb0AeJ-DRGIOdWAXsQ9hFdp1sCgHERVw5uOEnLmW67zDH55sKWMsuJ1ds6g84YJ0wECPAsRfPdo3Pi8cX4SGCFqr2qki2oHe587igji9tKX3vIU0aARxiTRBfzpfyoVdTaGWH2z-hpBhytnOO82IUYgQuL53YtRLBkdGgRhkDZiiyPbErAEi8LQ',
+    badge: 'New',
+    sizes: ['XS', 'S', 'M', 'L'],
+    colors: ['Warm Ivory', 'Dusty Gold'],
+    colorsHex: {
+      'Warm Ivory': '#F9F7F2',
+      'Dusty Gold': '#C4A46D'
+    },
+    imagesByColor: {
+      'Warm Ivory': [
+        'https://lh3.googleusercontent.com/aida/ADBb0ugjDUxBKpvtbeftQMJvQjNkJA9T8YwSfO1hnezXA57ehNdRXVwuoANKG_VxBlRWsJ41-WZeQg1GnEJ4uSVWSmeTEw-skEkgRZzBCrQBrUE3eLRPwTEUD9X22aGU6saxZCz9kdYwnXwdP15IZeW1eSnW_Vr1Eyi-vPnRM3w7o9OVyAL6niv4RcElvJqEeh8kGN1W9tEr6roqE9v0CCnnpI1Rvte5_n0-wMH8h-BUhYXRyXJpgK5w830G2w'
+      ],
+      'Dusty Gold': [
+        'https://lh3.googleusercontent.com/aida/ADBb0uhM6Pq6vNQH2-aiTRcQNt1HTfmCIfolJs5WvRnRPCPcLGATDpsu7jjYK0GiLiLEMsjAb0AeJ-DRGIOdWAXsQ9hFdp1sCgHERVw5uOEnLmW67zDH55sKWMsuJ1ds6g84YJ0wECPAsRfPdo3Pi8cX4SGCFqr2qki2oHe587igji9tKX3vIU0aARxiTRBfzpfyoVdTaGWH2z-hpBhytnOO82IUYgQuL53YtRLBkdGgRhkDZiiyPbErAEi8LQ'
+      ]
+    },
+    inStock: true,
+    description: 'Delicate ivory hand-woven top with intricate artisan detailing. Light as a feather, rich in heritage.'
+  },
+  {
+    id: 'sage-dress',
+    title: 'Sage Green Wrap Dress',
+    price: 1099,
+    originalPrice: 1549,
+    category: 'Dresses',
+    imageMain: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCl1HPXFCnM0MqV24xsmv_tpPOygjO3cbY_mVQmnrBc_a6iEH5m_Qo5_4RHv6EAOLLnfOS-8qCU179yBRE7mlNZp4nn2AAc9vACw7DilmlON36SK5zknpLQ558EcC8EsRktJm06EG2Qy9lMN1-2Te4A3DnFaMQ1dWmBruvgNjQMNLcHmwwWk_fIbc1rDLQ25QqoGnc3AP9FZCuiblM_iTA7vgiaP-kKMKasI1XUXJvBfxd898gsxNUB_R0cXB6IDa_wIK5mdpoIEQ',
+    imageHover: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAuNw8hYoPckUEXbG1HurK3uNM3wR7cxf3-bytxiD-n9GjebK5kK5BaEEj1hmExCSi7fCh3zj96WwQYd9WjKSk4iGI112LaFgpplgQqiIjVW1fNDJhra9mBHlTwvfxf6ZNolxteYCDcqVq98c9_kFo6IO2ZjEbvHeFyVZC37me6TAEFtm8s80GwypZENuqWFefTcG0jobmWHxhWON9Se9zPDy8Hflk3kpJRvTY_pFEEyQeu_6RS3tRjKrW-pLFbbludN0h1uyNp0Q',
+    badge: '',
+    sizes: ['XS', 'S', 'M', 'L'],
+    colors: ['Sage Green'],
+    colorsHex: {
+      'Sage Green': '#7D9B76'
+    },
+    imagesByColor: {
+      'Sage Green': [
+        'https://lh3.googleusercontent.com/aida-public/AB6AXuCl1HPXFCnM0MqV24xsmv_tpPOygjO3cbY_mVQmnrBc_a6iEH5m_Qo5_4RHv6EAOLLnfOS-8qCU179yBRE7mlNZp4nn2AAc9vACw7DilmlON36SK5zknpLQ558EcC8EsRktJm06EG2Qy9lMN1-2Te4A3DnFaMQ1dWmBruvgNjQMNLcHmwwWk_fIbc1rDLQ25QqoGnc3AP9FZCuiblM_iTA7vgiaP-kKMKasI1XUXJvBfxd898gsxNUB_R0cXB6IDa_wIK5mdpoIEQ'
+      ]
+    },
+    inStock: true,
+    description: 'Breezy sage green wrap dress with delicate hand-painted accents. Perfect for both casual gatherings and evening events.'
+  },
+  {
+    id: 'mustard-shirt',
+    title: 'Mustard Block Print Shirt',
+    price: 879,
+    originalPrice: 1199,
+    category: 'Shirts',
+    imageMain: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCIMCleAHy_Z09EtEd1LYIX1Jj3daP_uqwC2XO5XCRXnyiDcX35qnAkLGPSzKzRgWJZX-wgK_AAe2zEAwYgMXsGL7r1Z5yhBUl-mHaiMFpGv7_Xaq2nzB3OkjK6_NSOWwWH5jpyxH3Iy99c1vWTxbrvFw8KgkgQK95gT8WsTLqdar6HA7v2xg6waS2GGGqTdi6vuKBR_5KCzEpaTp7LuZL83frPFAZFgMi5o39nl005PCcfJgJC6e24lENeLmfXfxVmMArgE_Kb7A',
+    imageHover: 'https://lh3.googleusercontent.com/aida/ADBb0uhHH7mxDCG7lrhSujAhShHknl1mly9T_I-5RQ54mlttUqaFGv4MaNIDzQD_cipBnsfot0gxJXwq0evVgfsYZeJG1nlJcEDheRPqPRYHL2rlOqH4z-fjXnUGS8BksaDh59BWRvbekkqH178KNDnOe0OL7WbDaSNsVGam1MTiXwNBFxKgiyk7hKAl_pmCRDfVObkAonP8qufWzoGRtvyR3oGZ9oWb9Fu3TkWm4NcMRpn2fCfLhueD-93MtQ',
+    badge: 'Sale',
+    sizes: ['S', 'M', 'L', 'XL'],
+    colors: ['Mustard Yellow', 'Charcoal'],
+    colorsHex: {
+      'Mustard Yellow': '#D4A017',
+      'Charcoal': '#2E2F30'
+    },
+    imagesByColor: {
+      'Mustard Yellow': [
+        'https://lh3.googleusercontent.com/aida-public/AB6AXuCIMCleAHy_Z09EtEd1LYIX1Jj3daP_uqwC2XO5XCRXnyiDcX35qnAkLGPSzKzRgWJZX-wgK_AAe2zEAwYgMXsGL7r1Z5yhBUl-mHaiMFpGv7_Xaq2nzB3OkjK6_NSOWwWH5jpyxH3Iy99c1vWTxbrvFw8KgkgQK95gT8WsTLqdar6HA7v2xg6waS2GGGqTdi6vuKBR_5KCzEpaTp7LuZL83frPFAZFgMi5o39nl005PCcfJgJC6e24lENeLmfXfxVmMArgE_Kb7A'
+      ],
+      'Charcoal': [
+        'https://lh3.googleusercontent.com/aida/ADBb0uhHH7mxDCG7lrhSujAhShHknl1mly9T_I-5RQ54mlttUqaFGv4MaNIDzQD_cipBnsfot0gxJXwq0evVgfsYZeJG1nlJcEDheRPqPRYHL2rlOqH4z-fjXnUGS8BksaDh59BWRvbekkqH178KNDnOe0OL7WbDaSNsVGam1MTiXwNBFxKgiyk7hKAl_pmCRDfVObkAonP8qufWzoGRtvyR3oGZ9oWb9Fu3TkWm4NcMRpn2fCfLhueD-93MtQ'
+      ]
+    },
+    inStock: true,
+    description: 'Vibrant mustard block print shirt with bold geometric patterns. A statement piece for the confident dresser.'
+  },
+  {
+    id: 'navy-coord',
+    title: 'Navy Linen Co-ord Set',
+    price: 1249,
+    originalPrice: 1749,
+    category: 'Co-ords',
+    imageMain: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAuNw8hYoPckUEXbG1HurK3uNM3wR7cxf3-bytxiD-n9GjebK5kK5BaEEj1hmExCSi7fCh3zj96WwQYd9WjKSk4iGI112LaFgpplgQqiIjVW1fNDJhra9mBHlTwvfxf6ZNolxteYCDcqVq98c9_kFo6IO2ZjEbvHeFyVZC37me6TAEFtm8s80GwypZENuqWFefTcG0jobmWHxhWON9Se9zPDy8Hflk3kpJRvTY_pFEEyQeu_6RS3tRjKrW-pLFbbludN0h1uyNp0Q',
+    imageHover: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCl1HPXFCnM0MqV24xsmv_tpPOygjO3cbY_mVQmnrBc_a6iEH5m_Qo5_4RHv6EAOLLnfOS-8qCU179yBRE7mlNZp4nn2AAc9vACw7DilmlON36SK5zknpLQ558EcC8EsRktJm06EG2Qy9lMN1-2Te4A3DnFaMQ1dWmBruvgNjQMNLcHmwwWk_fIbc1rDLQ25QqoGnc3AP9FZCuiblM_iTA7vgiaP-kKMKasI1XUXJvBfxd898gsxNUB_R0cXB6IDa_wIK5mdpoIEQ',
+    badge: '',
+    sizes: ['S', 'M', 'L'],
+    colors: ['Navy Blue', 'Charcoal'],
+    colorsHex: {
+      'Navy Blue': '#1B2A4A',
+      'Charcoal': '#2E2F30'
+    },
+    imagesByColor: {
+      'Navy Blue': [
+        'https://lh3.googleusercontent.com/aida-public/AB6AXuAuNw8hYoPckUEXbG1HurK3uNM3wR7cxf3-bytxiD-n9GjebK5kK5BaEEj1hmExCSi7fCh3zj96WwQYd9WjKSk4iGI112LaFgpplgQqiIjVW1fNDJhra9mBHlTwvfxf6ZNolxteYCDcqVq98c9_kFo6IO2ZjEbvHeFyVZC37me6TAEFtm8s80GwypZENuqWFefTcG0jobmWHxhWON9Se9zPDy8Hflk3kpJRvTY_pFEEyQeu_6RS3tRjKrW-pLFbbludN0h1uyNp0Q'
+      ],
+      'Charcoal': [
+        'https://lh3.googleusercontent.com/aida-public/AB6AXuCl1HPXFCnM0MqV24xsmv_tpPOygjO3cbY_mVQmnrBc_a6iEH5m_Qo5_4RHv6EAOLLnfOS-8qCU179yBRE7mlNZp4nn2AAc9vACw7DilmlON36SK5zknpLQ558EcC8EsRktJm06EG2Qy9lMN1-2Te4A3DnFaMQ1dWmBruvgNjQMNLcHmwwWk_fIbc1rDLQ25QqoGnc3AP9FZCuiblM_iTA7vgiaP-kKMKasI1XUXJvBfxd898gsxNUB_R0cXB6IDa_wIK5mdpoIEQ'
+      ]
+    },
+    inStock: true,
+    description: 'Clean-lined navy linen co-ord set combining traditional weaving technique with modern silhouettes.'
+  },
+  {
+    id: 'rose-kurti',
+    title: 'Rose Block Print Kurti',
+    price: 849,
+    originalPrice: 1199,
+    category: 'Tops',
+    imageMain: 'https://lh3.googleusercontent.com/aida/ADBb0uh_20mWET2r2RcBNYNFaKduKuVBR7soKlIY4ZuF3jMFJjjQSRUd6XEReKT3lHuDz_rGl6-cc_Nhhw2WIIlAetsVxwWEDvO7hyJ11G2BlhfAvAvCR45EKMXaGzYK84J9alMFe3a5Kgxkb2rhllrqmatIfbGODr5YX8xWVVBLh-QFB6tu-ZBAuh8Ktsk4FVyZ3KxN6A8klTrrkAzZdaYotAXCZnhwBtDCrkvvek3lBpkWGHHnOxPhRqUHxQ',
+    imageHover: 'https://lh3.googleusercontent.com/aida/ADBb0uj6jghwCIHBfIEkkRN58tAqA8sFXjmmZ0o0ed9s2mQ4XOeE-GtuVBYXz6Hn-55n-sVUd7xUdMRAf0MCmBCEi7ygxvZX6ciECSq4v50Xk-acp_PDB_lM3Rt3dqCKraMBCGdI7ycqLahSZjq6T_vEIeS6bPOsTGTd2pbEd1QbSoKQGPWShc9vzSBZmRNTIcSZkMZ2no9C8MXtN5ELwRWzEzmgzs9ONzvm8kz-5Gb61U6r4KGJBFySmr46Qg',
+    badge: '',
+    sizes: ['XS', 'S', 'M', 'L'],
+    colors: ['Rose Pink', 'Warm Ivory'],
+    colorsHex: {
+      'Rose Pink': '#E8A0A0',
+      'Warm Ivory': '#F9F7F2'
+    },
+    imagesByColor: {
+      'Rose Pink': [
+        'https://lh3.googleusercontent.com/aida/ADBb0uh_20mWET2r2RcBNYNFaKduKuVBR7soKlIY4ZuF3jMFJjjQSRUd6XEReKT3lHuDz_rGl6-cc_Nhhw2WIIlAetsVxwWEDvO7hyJ11G2BlhfAvAvCR45EKMXaGzYK84J9alMFe3a5Kgxkb2rhllrqmatIfbGODr5YX8xWVVBLh-QFB6tu-ZBAuh8Ktsk4FVyZ3KxN6A8klTrrkAzZdaYotAXCZnhwBtDCrkvvek3lBpkWGHHnOxPhRqUHxQ'
+      ],
+      'Warm Ivory': [
+        'https://lh3.googleusercontent.com/aida/ADBb0uj6jghwCIHBfIEkkRN58tAqA8sFXjmmZ0o0ed9s2mQ4XOeE-GtuVBYXz6Hn-55n-sVUd7xUdMRAf0MCmBCEi7ygxvZX6ciECSq4v50Xk-acp_PDB_lM3Rt3dqCKraMBCGdI7ycqLahSZjq6T_vEIeS6bPOsTGTd2pbEd1QbSoKQGPWShc9vzSBZmRNTIcSZkMZ2no9C8MXtN5ELwRWzEzmgzs9ONzvm8kz-5Gb61U6r4KGJBFySmr46Qg'
+      ]
+    },
+    inStock: true,
+    description: 'Elegant rose block print kurti with traditional motifs. Pairs beautifully with both jeans and palazzos.'
   }
 ];

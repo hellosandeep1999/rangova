@@ -1,6 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-export default function Checkout({ cart, subtotal, navigateTo, setIsCartOpen, setCart, triggerNotification }) {
+export default function Checkout({ cart, subtotal, navigateTo, setIsCartOpen, setCart, triggerNotification, currentUser, discount }) {
+  const [selectedAddress, setSelectedAddress] = useState(currentUser?.addresses?.[0] || 'new');
+
+  const discountAmount = discount && discount.active ? Math.round(subtotal * (discount.percent/100)) : 0;
+  const finalTotal = subtotal - discountAmount;
   return (
     <div className="min-h-screen flex flex-col bg-warm-ivory text-left">
       {/* Minimal Header */}
@@ -49,6 +53,7 @@ export default function Checkout({ cart, subtotal, navigateTo, setIsCartOpen, se
               <input
                 required
                 type="email"
+                defaultValue={currentUser?.email || ''}
                 placeholder="Email Address"
                 className="w-full bg-transparent border-0 border-b border-outline-variant focus:border-primary focus:ring-0 py-3 text-sm rounded-none"
               />
@@ -56,23 +61,44 @@ export default function Checkout({ cart, subtotal, navigateTo, setIsCartOpen, se
 
             <section className="space-y-5">
               <h2 className="font-headline-sm text-lg font-bold text-primary">Shipping Address</h2>
-              <select className="w-full bg-transparent border-0 border-b border-outline-variant focus:border-primary focus:ring-0 py-3 text-sm rounded-none">
-                <option value="IN">India</option>
-                <option value="US">United States</option>
-                <option value="UK">United Kingdom</option>
-              </select>
-              <div className="grid grid-cols-2 gap-4">
-                <input required type="text" placeholder="First Name" className="w-full bg-transparent border-0 border-b border-outline-variant focus:border-primary focus:ring-0 py-3 text-sm rounded-none" />
-                <input required type="text" placeholder="Last Name" className="w-full bg-transparent border-0 border-b border-outline-variant focus:border-primary focus:ring-0 py-3 text-sm rounded-none" />
-              </div>
-              <input required type="text" placeholder="Address" className="w-full bg-transparent border-0 border-b border-outline-variant focus:border-primary focus:ring-0 py-3 text-sm rounded-none" />
-              <input type="text" placeholder="Apartment, suite, etc. (optional)" className="w-full bg-transparent border-0 border-b border-outline-variant focus:border-primary focus:ring-0 py-3 text-sm rounded-none" />
-              <div className="grid grid-cols-3 gap-4">
-                <input required type="text" placeholder="City" className="w-full bg-transparent border-0 border-b border-outline-variant focus:border-primary focus:ring-0 py-3 text-sm rounded-none" />
-                <input required type="text" placeholder="State" className="w-full bg-transparent border-0 border-b border-outline-variant focus:border-primary focus:ring-0 py-3 text-sm rounded-none" />
-                <input required type="text" placeholder="PIN Code" className="w-full bg-transparent border-0 border-b border-outline-variant focus:border-primary focus:ring-0 py-3 text-sm rounded-none" />
-              </div>
-              <input required type="tel" placeholder="Phone Number" className="w-full bg-transparent border-0 border-b border-outline-variant focus:border-primary focus:ring-0 py-3 text-sm rounded-none" />
+              
+              {currentUser && currentUser.addresses && currentUser.addresses.length > 0 && (
+                <div className="mb-4">
+                  <label className="font-label-caps text-[10px] text-secondary tracking-wider block mb-2 uppercase">Select a Saved Address</label>
+                  <select 
+                    value={selectedAddress}
+                    onChange={(e) => setSelectedAddress(e.target.value)}
+                    className="w-full bg-surface border border-outline-variant/50 focus:border-primary focus:ring-0 py-3 text-sm rounded-none px-4"
+                  >
+                    {currentUser.addresses.map((addr, idx) => (
+                      <option key={idx} value={addr}>{addr}</option>
+                    ))}
+                    <option value="new">Use a new address</option>
+                  </select>
+                </div>
+              )}
+
+              {selectedAddress === 'new' && (
+                <>
+                  <select className="w-full bg-transparent border-0 border-b border-outline-variant focus:border-primary focus:ring-0 py-3 text-sm rounded-none">
+                    <option value="IN">India</option>
+                    <option value="US">United States</option>
+                    <option value="UK">United Kingdom</option>
+                  </select>
+                  <div className="grid grid-cols-2 gap-4">
+                    <input required type="text" placeholder="First Name" className="w-full bg-transparent border-0 border-b border-outline-variant focus:border-primary focus:ring-0 py-3 text-sm rounded-none" />
+                    <input required type="text" placeholder="Last Name" className="w-full bg-transparent border-0 border-b border-outline-variant focus:border-primary focus:ring-0 py-3 text-sm rounded-none" />
+                  </div>
+                  <input required type="text" placeholder="Address" className="w-full bg-transparent border-0 border-b border-outline-variant focus:border-primary focus:ring-0 py-3 text-sm rounded-none" />
+                  <input type="text" placeholder="Apartment, suite, etc. (optional)" className="w-full bg-transparent border-0 border-b border-outline-variant focus:border-primary focus:ring-0 py-3 text-sm rounded-none" />
+                  <div className="grid grid-cols-3 gap-4">
+                    <input required type="text" placeholder="City" className="w-full bg-transparent border-0 border-b border-outline-variant focus:border-primary focus:ring-0 py-3 text-sm rounded-none" />
+                    <input required type="text" placeholder="State" className="w-full bg-transparent border-0 border-b border-outline-variant focus:border-primary focus:ring-0 py-3 text-sm rounded-none" />
+                    <input required type="text" placeholder="PIN Code" className="w-full bg-transparent border-0 border-b border-outline-variant focus:border-primary focus:ring-0 py-3 text-sm rounded-none" />
+                  </div>
+                  <input required type="tel" placeholder="Phone Number" className="w-full bg-transparent border-0 border-b border-outline-variant focus:border-primary focus:ring-0 py-3 text-sm rounded-none" />
+                </>
+              )}
             </section>
 
             <div className="flex flex-col-reverse md:flex-row md:justify-between md:items-center gap-4 pt-5 border-t border-outline-variant/20">
@@ -88,7 +114,7 @@ export default function Checkout({ cart, subtotal, navigateTo, setIsCartOpen, se
                 type="submit"
                 className="bg-primary text-on-primary px-8 py-4 font-label-caps text-label-caps hover:bg-secondary transition-all w-full md:w-auto border-none tracking-widest"
               >
-                PLACE ORDER (₹{subtotal.toLocaleString()})
+                PLACE ORDER (₹{finalTotal.toLocaleString()})
               </button>
             </div>
           </form>
@@ -118,13 +144,19 @@ export default function Checkout({ cart, subtotal, navigateTo, setIsCartOpen, se
                 <span>Subtotal</span>
                 <span className="text-primary font-bold">₹{subtotal.toLocaleString()}</span>
               </div>
+              {discount && discount.active && (
+                <div className="flex justify-between text-green-700">
+                  <span className="flex items-center gap-1.5"><span className="material-symbols-outlined text-[14px]">loyalty</span> Discount ({discount.percent}%)</span>
+                  <span className="font-bold">-₹{discountAmount.toLocaleString()}</span>
+                </div>
+              )}
               <div className="flex justify-between text-secondary">
                 <span>Shipping</span>
                 <span className="text-primary font-bold italic">FREE Express</span>
               </div>
               <div className="flex justify-between items-center text-primary font-bold text-base pt-4 border-t border-primary/10">
                 <span>Total</span>
-                <span>₹{subtotal.toLocaleString()}</span>
+                <span>₹{finalTotal.toLocaleString()}</span>
               </div>
             </div>
           </div>

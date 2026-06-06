@@ -9,27 +9,26 @@ export default function Header({
   totalItemsCount, 
   setIsCartOpen,
   currentUser,
-  setCurrentUser
+  setCurrentUser,
+  discount
 }) {
-  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
 
   const handleProfileClick = () => {
     if (!currentUser) {
       navigateTo('login');
-      setIsProfileDropdownOpen(false);
     } else {
-      setIsProfileDropdownOpen(!isProfileDropdownOpen);
+      navigateTo('profile');
     }
   };
 
-  const handleLogout = () => {
-    setCurrentUser(null);
-    setIsProfileDropdownOpen(false);
-    navigateTo('home');
-  };
-
   return (
-    <header className={`sticky top-0 z-50 bg-surface transition-all duration-300 w-full border-b border-surface-variant/30 ${isHeaderShrunk ? 'py-3 shadow-md' : 'py-5 shadow-sm'}`}>
+    <>
+      {discount && discount.active && (
+        <div className="bg-primary text-white text-[10px] font-label-caps uppercase tracking-widest text-center py-2 px-4 w-full relative z-[60]">
+          {discount.text}
+        </div>
+      )}
+      <header className={`sticky top-0 z-50 bg-surface transition-all duration-300 w-full border-b border-surface-variant/30 ${isHeaderShrunk ? 'py-3 shadow-md' : 'py-5 shadow-sm'}`}>
       <nav className="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto relative">
         
         {/* Left Nav (Desktop) */}
@@ -96,7 +95,7 @@ export default function Header({
           </button>
           <button 
             onClick={handleProfileClick} 
-            className={`hover:opacity-70 transition-all duration-200 relative flex items-center ${currentPage === 'login' || isProfileDropdownOpen ? 'text-muted-terracotta font-bold' : ''}`}
+            className={`hover:opacity-70 transition-all duration-200 relative flex items-center ${currentPage === 'login' || currentPage === 'profile' ? 'text-muted-terracotta font-bold' : ''}`}
             aria-label="Profile"
           >
             <span className="material-symbols-outlined text-[22px] md:text-[24px]">person</span>
@@ -104,55 +103,6 @@ export default function Header({
               <span className="absolute bottom-0 right-0 w-2 h-2 bg-green-500 rounded-full border border-white"></span>
             )}
           </button>
-
-          {/* Premium Account Dropdown */}
-          {isProfileDropdownOpen && currentUser && (
-            <div className="fixed md:absolute left-4 right-4 md:left-auto md:right-0 top-16 md:top-10 w-[calc(100vw-32px)] md:w-96 bg-white border border-outline-variant/30 shadow-2xl p-6 z-50 text-left animate-fadeIn font-body-md text-primary rounded-lg md:rounded-none">
-              <div className="flex justify-between items-center border-b border-outline-variant/20 pb-4 mb-4">
-                <div>
-                  <h4 className="font-headline-sm text-sm font-bold">{currentUser.name}</h4>
-                  <p className="text-xs text-secondary">{currentUser.email}</p>
-                </div>
-                <button 
-                  onClick={handleLogout}
-                  className="font-label-caps text-[9px] bg-primary text-white px-2.5 py-1 hover:bg-muted-terracotta transition-colors uppercase tracking-wider"
-                >
-                  Log Out
-                </button>
-              </div>
-
-              {/* Saved Addresses */}
-              <div className="mb-4">
-                <span className="font-label-caps text-[10px] text-secondary tracking-wider block mb-2 uppercase">Saved Addresses</span>
-                <div className="space-y-2 max-h-[80px] overflow-y-auto pr-1">
-                  {currentUser.addresses.map((addr, idx) => (
-                    <div key={idx} className="text-xs text-secondary bg-warm-ivory p-2 border border-outline-variant/10 rounded-sm leading-relaxed">
-                      {addr}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Previous Orders */}
-              <div>
-                <span className="font-label-caps text-[10px] text-secondary tracking-wider block mb-2 uppercase">Order History</span>
-                <div className="space-y-3 max-h-[140px] overflow-y-auto pr-1">
-                  {currentUser.orders.map((order) => (
-                    <div key={order.id} className="text-xs border-b border-outline-variant/10 pb-2 last:border-b-0">
-                      <div className="flex justify-between font-bold mb-1">
-                        <span>{order.id}</span>
-                        <span className="text-muted-terracotta font-semibold">₹{order.total.toLocaleString()}</span>
-                      </div>
-                      <div className="flex justify-between text-secondary text-[11px]">
-                        <span>{order.items}</span>
-                        <span className="bg-soft-beige px-1.5 py-0.5 rounded-full text-[9px] text-primary">{order.status}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
         </div>
 
       </nav>
@@ -212,40 +162,16 @@ export default function Header({
                   <span className="material-symbols-outlined text-xs">arrow_forward_ios</span>
                 </button>
               ) : (
-                <div className="bg-warm-ivory p-4 border border-outline-variant/30 text-left mt-3">
-                  <div className="flex justify-between items-center mb-3">
-                    <div>
-                      <h4 className="font-headline-sm text-sm font-bold">{currentUser.name}</h4>
-                      <p className="text-xs text-secondary">{currentUser.email}</p>
-                    </div>
-                    <button 
-                      onClick={() => {
-                        handleLogout();
-                        setIsMobileMenuOpen(false);
-                      }}
-                      className="font-label-caps text-[9px] bg-primary text-white px-2 py-1 uppercase"
-                    >
-                      Log Out
-                    </button>
-                  </div>
-                  
-                  <div className="mb-3">
-                    <span className="font-label-caps text-[9px] text-secondary tracking-widest block mb-1">Addresses</span>
-                    {currentUser.addresses.map((addr, idx) => (
-                      <p key={idx} className="text-[11px] text-secondary leading-snug mb-1">{addr}</p>
-                    ))}
-                  </div>
-
-                  <div>
-                    <span className="font-label-caps text-[9px] text-secondary tracking-widest block mb-1">Recent Orders</span>
-                    {currentUser.orders.map((o) => (
-                      <div key={o.id} className="text-[11px] flex justify-between border-t border-outline-variant/10 pt-1.5 mt-1.5">
-                        <span>{o.id} • {o.items}</span>
-                        <span className="font-bold">{o.status}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                <button 
+                  onClick={() => {
+                    navigateTo('profile');
+                    setIsMobileMenuOpen(false);
+                  }} 
+                  className={`font-display-lg text-xl tracking-normal uppercase flex items-center justify-between w-full py-1.5 border-b border-surface-variant/20 ${currentPage === 'profile' ? 'text-muted-terracotta font-bold' : 'text-secondary'}`}
+                >
+                  <span>My Profile</span>
+                  <span className="material-symbols-outlined text-xs">arrow_forward_ios</span>
+                </button>
               )}
             </li>
           </ul>
@@ -256,6 +182,7 @@ export default function Header({
           </div>
         </div>
       )}
-    </header>
+      </header>
+    </>
   );
 }

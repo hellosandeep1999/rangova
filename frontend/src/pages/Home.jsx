@@ -94,10 +94,28 @@ export default function Home({ navigateTo, setCategoryFilter, addToCart, PRODUCT
     return () => clearInterval(interval);
   }, []);
 
+  // Lazy load sections on scroll
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+        }
+      });
+    }, { threshold: 0.1 });
+
+    const hiddenElements = document.querySelectorAll('.reveal-on-scroll');
+    hiddenElements.forEach((el) => observer.observe(el));
+
+    return () => {
+      hiddenElements.forEach((el) => observer.unobserve(el));
+    };
+  }, []);
+
   return (
     <div>
       {/* ── Hero Carousel (no prev/next buttons, reduced height) ── */}
-      <section className="relative w-full h-[52vh] md:h-[68vh] overflow-hidden bg-surface-container">
+      <section className="relative w-full h-[42vh] md:h-[58vh] overflow-hidden bg-surface-container">
         {HERO_SLIDES.map((slide, i) => (
           <div
             key={i}
@@ -140,7 +158,7 @@ export default function Home({ navigateTo, setCategoryFilter, addToCart, PRODUCT
       </section>
 
       {/* ── Curated Categories (auto-scrolls, no buttons, bigger cards) ── */}
-      <section className="pt-10 md:pt-14 px-0">
+      <section className="pt-10 md:pt-14 px-0 reveal-on-scroll">
         <div className="px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto mb-5">
           <span className="font-label-caps text-label-caps text-muted-terracotta tracking-[0.2em] mb-2 uppercase block text-[10px]">Discover Our World</span>
           <h2 className="font-headline-xl text-[24px] md:text-[38px] text-primary">Curated Categories</h2>
@@ -177,7 +195,7 @@ export default function Home({ navigateTo, setCategoryFilter, addToCart, PRODUCT
       </section>
 
       {/* ── Must-Have Sets ── */}
-      <section className="bg-surface-alt py-10 md:py-14">
+      <section className="bg-surface-alt py-10 md:py-14 reveal-on-scroll">
         <div className="px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-end mb-8 gap-4">
             <div className="text-left">
@@ -193,7 +211,7 @@ export default function Home({ navigateTo, setCategoryFilter, addToCart, PRODUCT
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
-            {PRODUCTS.slice(0, 6).map((prod) => (
+            {PRODUCTS.slice(0, 10).map((prod) => (
               <div
                 key={prod.id}
                 onClick={() => {
@@ -253,7 +271,7 @@ export default function Home({ navigateTo, setCategoryFilter, addToCart, PRODUCT
       </section>
 
       {/* ── Fashion Reels Section — auto-playing looping vertical video tiles ── */}
-      <section className="py-10 md:py-14 bg-warm-ivory">
+      <section className="py-10 md:py-14 bg-warm-ivory reveal-on-scroll">
         <div className="px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto mb-6">
           <span className="font-label-caps text-[10px] text-muted-terracotta tracking-[0.25em] uppercase mb-2 block">Style in Motion</span>
           <h2 className="font-headline-xl text-[24px] md:text-[38px] text-primary">Fashion Reels</h2>
@@ -289,7 +307,7 @@ export default function Home({ navigateTo, setCategoryFilter, addToCart, PRODUCT
       </section>
 
       {/* ── Team Working Reels — continuously scrolling marquee ── */}
-      <section className="py-10 md:py-12 bg-primary overflow-hidden">
+      <section className="py-10 md:py-12 bg-primary overflow-hidden reveal-on-scroll">
         <div className="px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto mb-6">
           <span className="font-label-caps text-[10px] text-dusty-gold tracking-[0.25em] uppercase mb-2 block">Behind the Craft</span>
           <h2 className="font-headline-xl text-[24px] md:text-[38px] text-white">Team Working Reels</h2>
@@ -330,7 +348,7 @@ export default function Home({ navigateTo, setCategoryFilter, addToCart, PRODUCT
       </section>
 
       {/* ── Voice of Rangova (scrollable, no buttons) ── */}
-      <section className="py-10 md:py-14 bg-white overflow-hidden">
+      <section className="py-10 md:py-14 bg-white overflow-hidden reveal-on-scroll">
         <div className="px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto mb-6">
           <span className="font-label-caps text-[10px] text-muted-terracotta tracking-[0.25em] uppercase mb-2 block">Customer Stories</span>
           <h2 className="font-headline-xl text-[24px] md:text-[38px] text-primary">Voice of Rangova</h2>
@@ -367,7 +385,7 @@ export default function Home({ navigateTo, setCategoryFilter, addToCart, PRODUCT
       </section>
 
       {/* ── Brand Spread ── */}
-      <section className="w-full h-[28vh] md:h-[38vh] relative">
+      <section className="w-full h-[28vh] md:h-[38vh] relative reveal-on-scroll">
         <img alt="Brand overlay" className="w-full h-full object-cover object-center" src={HERO_SLIDES[0].img} />
         <div className="absolute inset-0 bg-black/15" />
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">

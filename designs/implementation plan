@@ -1,0 +1,261 @@
+# Rangova — Full Admin Panel + Supabase Backend
+
+## Overview
+
+This plan covers:
+1. **Supabase** setup — auth, database, storage for all images
+2. **Node.js Express API** backend — all CRUD endpoints
+3. **React Admin Panel** — complete replacement of the stub `Admin.jsx` with a full-featured admin dashboard
+4. **Frontend wired to API** — replace hardcoded data with Supabase/API calls
+
+---
+
+## User Review Required
+
+> [!IMPORTANT]
+> **Before I can start building**, I need the following from you:
+> 1. **Supabase Project URL** — e.g. `https://xyzabc.supabase.co`
+> 2. **Supabase Anon/Public Key** — from your Supabase dashboard → Settings → API
+> 3. **Admin Username & Password** — what credentials do you want for the admin panel login? (e.g. `admin` / `rangova@2024`)
+>
+> These will be stored in a `.env` file — **never committed to git**.
+
+> [!WARNING]
+> This is a **significant architectural change**. The frontend currently uses hardcoded data in `products.js`. After this change, all data will come from Supabase via a Node.js API. The existing static `PRODUCTS` array will be seeded into the database on first run.
+
+---
+
+## Open Questions
+
+> [!IMPORTANT]
+> 1. **Port for Node backend?** Default: `3001`. OK?
+> 2. **Admin panel URL/route**: Currently accessible at `/admin` (no separate URL, same SPA). Should it stay as a page within the React app, or do you want a completely separate `admin.html` entry point? (Recommendation: keep within same app, protected by login screen)
+> 3. **Payment/Transactions**: Do you want real payment gateway integration (Razorpay etc.) or just transaction records from placed orders?
+> 4. **Order slips download format**: PDF slip per order, or bulk CSV export of new orders?
+
+---
+
+## Architecture
+
+```
+rangova/
+├── frontend/          (Vite + React — existing)
+│   └── src/
+│       ├── lib/
+│       │   ├── supabase.js       [NEW] Supabase client
+│       │   └── api.js            [NEW] API helper functions
+│       ├── pages/
+│       │   └── Admin.jsx         [REPLACE] Full admin panel
+│       └── ...
+├── backend/           [NEW] Node.js Express API
+│   ├── index.js
+│   ├── routes/
+│   │   ├── products.js
+│   │   ├── categories.js
+│   │   ├── orders.js
+│   │   ├── customers.js
+│   │   ├── inventory.js
+│   │   ├── discounts.js
+│   │   └── auth.js
+│   ├── middleware/
+│   │   └── adminAuth.js
+│   └── package.json
+└── .env               [NEW] Supabase keys, admin credentials
+```
+
+---
+
+## Supabase Database Schema
+
+### Tables to Create
+
+| Table | Key Columns |
+|-------|-------------|
+| `products` | id, title, price, original_price, category_id, badge, sizes[], colors[], description, in_stock, image_main, image_hover, images_by_color (jsonb) |
+| `categories` | id, title, idx, image_url, slug |
+| `orders` | id, customer_name, email, phone, address, items (jsonb), subtotal, discount, total, status, created_at |
+| `customers` | id, name, email, phone, total_orders, total_spent, created_at |
+| `inventory` | id, product_id, size, color, stock_qty |
+| `discounts` | id, code, text, percent, active |
+| `site_settings` | key, value (jsonb) — for hero slides, banners, etc. |
+| `transactions` | id, order_id, amount, method, status, created_at |
+
+### Supabase Storage Buckets
+- `product-images` — product main, hover, color variant images
+- `category-images` — category card images
+- `hero-images` — hero carousel slides
+
+---
+
+## Proposed Changes
+
+### Backend — Node.js Express API
+
+#### [NEW] `backend/package.json`
+- Dependencies: express, cors, dotenv, @supabase/supabase-js, multer, uuid, jsonwebtoken
+
+#### [NEW] `backend/index.js`
+- Express server on port 3001
+- CORS configured for frontend
+- Routes: `/api/products`, `/api/categories`, `/api/orders`, `/api/customers`, `/api/inventory`, `/api/discounts`, `/api/auth`, `/api/settings`, `/api/transactions`
+
+#### [NEW] `backend/routes/products.js`
+- GET /api/products — list all
+- GET /api/products/:id — single product
+- POST /api/products — create (with image upload to Supabase Storage)
+- PUT /api/products/:id — update
+- DELETE /api/products/:id — delete
+
+#### [NEW] `backend/routes/orders.js`
+- GET /api/orders — list all orders (with filters: status, date)
+- GET /api/orders/new — new orders for slip download
+- PATCH /api/orders/:id/status — update order status
+- GET /api/orders/:id/slip — generate order slip (PDF or printable HTML)
+
+#### [NEW] `backend/routes/categories.js`, `customers.js`, `inventory.js`, `discounts.js`
+- Full CRUD for each
+
+#### [NEW] `backend/middleware/adminAuth.js`
+- JWT-based admin authentication middleware
+
+---
+
+### Frontend — Supabase Client & API Layer
+
+#### [NEW] `src/lib/supabase.js`
+- Supabase JS client initialized with project URL and anon key from env
+
+#### [NEW] `src/lib/api.js`
+- Wrapper functions calling the backend API
+- `getProducts()`, `createProduct()`, `updateProduct()`, `deleteProduct()`
+- `getOrders()`, `updateOrderStatus()`, `downloadOrderSlip()`
+- `getCategories()`, `getCustomers()`, `getDiscounts()`, etc.
+
+---
+
+### Frontend — Admin Panel (Full Replacement)
+
+#### [MODIFY] `src/pages/Admin.jsx`
+Complete rewrite with these sections:
+
+**Sidebar Navigation:**
+- Dashboard
+- Products (+ Add)
+- Categories
+- Orders
+- Inventory
+- Customers
+- Discounts & Promotions
+- Transactions
+- Site Settings (hero slides, banners)
+- Settings
+
+**Dashboard Tab:**
+- KPI cards: Revenue, Orders (today/total), Products, Customers, Low Stock alerts
+- Recent orders table
+- Revenue chart (simple bar chart in CSS/SVG)
+- Top selling products
+
+**Products Tab:**
+- Table with image, name, category, price, stock status
+- Add Product modal: name, description, price, original price, category, badge, sizes, colors, upload images (main + hover + per-color)
+- Edit inline or modal
+- Delete with confirmation
+
+**Categories Tab:**
+- Grid view of categories
+- Add/Edit: title, index, upload image
+- Reorder
+
+**Orders Tab:**
+- Filter by status: Pending / Processing / Shipped / Delivered / Cancelled
+- Update order status dropdown
+- View order details
+- "Download New Orders Slips" button — downloads a printable PDF/HTML per new order with customer details, items, address
+
+**Inventory Tab:**
+- Per product/size/color stock quantity
+- Edit stock qty inline
+- Low stock alerts (qty < 5)
+
+**Customers Tab:**
+- List all customers
+- View order history per customer
+- Total spent
+
+**Discounts Tab:**
+- View/Edit/Add discount codes
+- Toggle active/inactive
+- Set discount percent and banner text (what shows in the site header)
+
+**Transactions Tab:**
+- List all payment transactions
+- Filter by date, status
+
+**Site Settings Tab:**
+- Edit hero carousel slides (image upload, headline, subtitle)
+- Edit footer content
+
+---
+
+### Frontend — Wiring Data from API
+
+#### [MODIFY] `src/App.jsx`
+- On mount, fetch products, discount, site settings from API
+- Pass real data (not hardcoded `PRODUCTS`) to all page components
+- On checkout submit, POST order to `/api/orders`
+
+#### [MODIFY] `src/pages/Home.jsx`, `Shop.jsx`, `Search.jsx`
+- Accept products from props (already do) — no change needed
+- Hero slides fetched from settings
+
+#### [MODIFY] `src/pages/Checkout.jsx`
+- On form submit, POST order details to backend
+- Store customer info in `customers` table
+
+---
+
+### Admin Login Screen
+
+#### Added inside `Admin.jsx`
+- Before showing the admin panel, show a clean login screen
+- Username + Password form
+- Calls `POST /api/auth/admin-login` → returns JWT token
+- Token stored in `sessionStorage`
+- All admin API calls include `Authorization: Bearer <token>`
+- "Back to store" link
+
+---
+
+## Verification Plan
+
+### Automated Tests
+- `npm run dev` in both frontend and backend
+- Test CRUD flows: add product → appears in shop, edit → updates, delete → removed
+
+### Manual Verification
+- Admin login with correct/incorrect credentials
+- Upload product image → stored in Supabase Storage → visible in shop
+- Place order → appears in admin Orders tab
+- Update order status → reflected in orders list
+- Download order slip → PDF/printable page opens
+- Toggle discount → banner on storefront updates
+- Edit hero slide → home page updates
+
+---
+
+## Implementation Order
+
+1. **Setup**: Install deps, create `.env`, init Supabase schema
+2. **Backend**: Build Express API with all routes
+3. **Admin Login**: Secure login screen inside Admin.jsx
+4. **Admin Dashboard**: Stats, recent orders
+5. **Products Management**: Full CRUD with image upload
+6. **Categories Management**: Full CRUD
+7. **Orders Management**: Status update + slip download
+8. **Inventory Management**: Stock tracking
+9. **Customers**: List + history
+10. **Discounts**: Code + banner text management
+11. **Transactions**: History view
+12. **Site Settings**: Hero/banner editing
+13. **Wire Frontend**: Replace hardcoded data with API calls throughout the app

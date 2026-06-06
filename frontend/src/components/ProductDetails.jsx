@@ -340,9 +340,9 @@ export default function ProductDetails({ navigateTo, addToCart, selectedProductI
               <h3 className="font-body-md text-[13px] md:text-sm text-primary mb-1 group-hover:text-muted-terracotta transition-colors truncate font-semibold leading-snug">{item.title}</h3>
               <div className="flex items-baseline gap-2">
                 <span className="font-price-lg text-xs md:text-sm text-primary font-bold">₹{item.price.toLocaleString()}</span>
-                {item.originalPrice && (
-                  <span className="text-[10px] md:text-xs text-secondary line-through opacity-50">₹{item.originalPrice.toLocaleString()}</span>
-                )}
+                <span className="text-[10px] md:text-xs text-secondary line-through opacity-50">
+                  ₹{(item.originalPrice || Math.round(item.price * 1.35)).toLocaleString()}
+                </span>
               </div>
               
               {/* Show available color swatches */}

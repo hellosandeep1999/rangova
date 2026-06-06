@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { PRODUCTS } from './data/products';
+import { getProducts } from './lib/api';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import CartDrawer from './components/CartDrawer';
@@ -12,27 +12,25 @@ import Login from './pages/Login';
 import Checkout from './pages/Checkout';
 import Contact from './pages/Contact';
 import Policies from './pages/Policies';
+import Profile from './pages/Profile';
+import Admin from './pages/Admin';
 
 function App() {
-  const [currentPage, setCurrentPage] = useState('home');
-  const [cart, setCart] = useState([
-    {
-      id: 'jaipur-tunic',
-      title: 'Jaipur Block Print Tunic',
-      price: 15170,
-      quantity: 1,
-      size: 'M',
-      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCIMCleAHy_Z09EtEd1LYIX1Jj3daP_uqwC2XO5XCRXnyiDcX35qnAkLGPSzKzRgWJZX-wgK_AAe2zEAwYgMXsGL7r1Z5yhBUl-mHaiMFpGv7_Xaq2nzB3OkjK6_NSOWwWH5jpyxH3Iy99c1vWTxbrvFw8KgkgQK95gT8WsTLqdar6HA7v2xg6waS2GGGqTdi6vuKBR_5KCzEpaTp7LuZL83frPFAZFgMi5o39nl005PCcfJgJC6e24lENeLmfXfxVmMArgE_Kb7A'
-    },
-    {
-      id: 'silk-scarf',
-      title: 'Artisan Silk Scarf',
-      price: 7790,
-      quantity: 2,
-      color: 'Terracotta',
-      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAMAZvhUkxL9nWVbg7dmMSF7GWEQdHQCNwJGZmmA1GLqpcA4tmu0BUJ17rURUoFa7fsklA35xxu1jjT6_y3t6PuXdO5sWGJCZI2Z73Ijz2G8SIpWoX3i5jNxHOfe8gheFd4FbDrlOSIwcoGEtiU2spwwi65hH0p_Wask0p0-oTIsAnOC6lWC2i0EH9QV7GX-0H3Thzusq1dh5wSfQYOPyBWCvru6SdF4K6NXTU84mO6cLYANIjxAdvQXFlaWNRWkWL4c728TM5jdA'
-    }
-  ]);
+  const [currentPage, setCurrentPage] = useState(window.location.pathname.replace('/', '') || 'home');
+  const [cart, setCart] = useState([]);
+  const [PRODUCTS, setPRODUCTS] = useState([]);
+
+  useEffect(() => {
+    const fetchProds = async () => {
+      try {
+        const data = await getProducts();
+        if (data) setPRODUCTS(data);
+      } catch (e) {
+        console.error('Error fetching products', e);
+      }
+    };
+    fetchProds();
+  }, []);
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [notification, setNotification] = useState('');
@@ -41,6 +39,7 @@ function App() {
   const [categoryFilter, setCategoryFilter] = useState('All');
 
   const [currentUser, setCurrentUser] = useState(null);
+  const [discount, setDiscount] = useState({ active: true, text: 'USE CODE RANGOVA10 FOR 10% OFF YOUR FIRST ORDER', percent: 10 });
 
   useEffect(() => {
     const handleScroll = () => setIsHeaderShrunk(window.scrollY > 50);
@@ -60,6 +59,7 @@ function App() {
 
   const navigateTo = (page) => {
     setCurrentPage(page);
+    window.history.pushState({}, '', '/' + (page === 'home' ? '' : page));
     setIsMobileMenuOpen(false);
   };
 
@@ -117,7 +117,7 @@ function App() {
       )}
 
       {/* Global Header */}
-      {currentPage !== 'checkout' && (
+      {currentPage !== 'checkout' && currentPage !== 'admin' && (
         <Header
           currentPage={currentPage}
           navigateTo={navigateTo}
@@ -128,6 +128,7 @@ function App() {
           setIsCartOpen={setIsCartOpen}
           currentUser={currentUser}
           setCurrentUser={setCurrentUser}
+          discount={discount}
         />
       )}
 
@@ -140,6 +141,7 @@ function App() {
         totalItemsCount={totalItemsCount}
         subtotal={subtotal}
         navigateTo={navigateTo}
+        discount={discount}
       />
 
       {/* Main Content */}
@@ -176,12 +178,20 @@ function App() {
             setIsCartOpen={setIsCartOpen}
             setCart={setCart}
             triggerNotification={triggerNotification}
+            currentUser={currentUser}
+            discount={discount}
           />
+        )}
+        {currentPage === 'profile' && (
+          <Profile navigateTo={navigateTo} currentUser={currentUser} setCurrentUser={setCurrentUser} triggerNotification={triggerNotification} />
+        )}
+        {currentPage === 'admin' && (
+          <Admin navigateTo={navigateTo} triggerNotification={triggerNotification} />
         )}
       </main>
 
       {/* Footer */}
-      {currentPage !== 'checkout' && (
+      {currentPage !== 'checkout' && currentPage !== 'admin' && (
         <Footer navigateTo={navigateTo} triggerNotification={triggerNotification} />
       )}
     </div>

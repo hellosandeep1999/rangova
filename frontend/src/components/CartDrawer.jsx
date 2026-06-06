@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
 
-export default function CartDrawer({ isCartOpen, setIsCartOpen, cart, updateQuantity, totalItemsCount, subtotal, navigateTo }) {
-  const [giftNoteOpen, setGiftNoteOpen] = useState(false);
-  const [giftNoteText, setGiftNoteText] = useState('');
-
+export default function CartDrawer({ isCartOpen, setIsCartOpen, cart, updateQuantity, totalItemsCount, subtotal, navigateTo, discount }) {
   if (!isCartOpen) return null;
 
   // Free Shipping Threshold: ₹25,000
@@ -124,27 +121,7 @@ export default function CartDrawer({ isCartOpen, setIsCartOpen, cart, updateQuan
                 </div>
               ))}
 
-              {/* Gift Instructions Section */}
-              <div className="border-t border-outline-variant/20 pt-4 mt-6">
-                <button
-                  onClick={() => setGiftNoteOpen(!giftNoteOpen)}
-                  className="flex justify-between items-center w-full text-left font-label-caps text-[9px] text-secondary hover:text-primary transition-colors uppercase tracking-widest bg-transparent border-none cursor-pointer py-1"
-                >
-                  <span>{giftNoteOpen ? 'Hide Gift Note Instructions' : 'Add Gift Note or Custom Instructions'}</span>
-                  <span className="material-symbols-outlined text-[14px]">
-                    {giftNoteOpen ? 'expand_less' : 'expand_more'}
-                  </span>
-                </button>
-                {giftNoteOpen && (
-                  <textarea
-                    value={giftNoteText}
-                    onChange={(e) => setGiftNoteText(e.target.value)}
-                    placeholder="Enter custom gift wrapping note or order instructions…"
-                    className="w-full bg-white border border-outline-variant/30 text-xs p-3 mt-2 outline-none focus:border-primary focus:ring-0 font-body-md"
-                    rows={3}
-                  />
-                )}
-              </div>
+
             </div>
           )}
         </div>
@@ -152,9 +129,26 @@ export default function CartDrawer({ isCartOpen, setIsCartOpen, cart, updateQuan
         {/* Footer */}
         {cart.length > 0 && (
           <div className="p-6 border-t border-outline-variant/20 bg-white space-y-4 shadow-xl">
-            <div className="flex justify-between items-center">
-              <span className="font-display-lg text-sm font-bold text-primary uppercase tracking-wide">Estimated Subtotal</span>
-              <span className="font-price-lg text-lg text-primary font-bold">₹{subtotal.toLocaleString()}</span>
+            <div className="flex justify-between items-center text-secondary mb-2">
+              <span className="font-display-lg text-sm font-bold uppercase tracking-wide">Estimated Subtotal</span>
+              <span className="font-price-lg text-sm font-bold">₹{subtotal.toLocaleString()}</span>
+            </div>
+            
+            {discount && discount.active && (
+              <div className="flex justify-between items-center text-green-700 mb-2">
+                <span className="font-display-lg text-sm font-bold uppercase tracking-wide flex items-center gap-2">
+                  <span className="material-symbols-outlined text-[16px]">loyalty</span>
+                  Discount ({discount.percent}%)
+                </span>
+                <span className="font-price-lg text-sm font-bold">-₹{Math.round(subtotal * (discount.percent/100)).toLocaleString()}</span>
+              </div>
+            )}
+            
+            <div className="flex justify-between items-center border-t border-outline-variant/20 pt-4 mt-2">
+              <span className="font-display-lg text-lg font-bold text-primary uppercase tracking-wide">Estimated Total</span>
+              <span className="font-price-lg text-xl text-primary font-bold">
+                ₹{(discount && discount.active ? Math.round(subtotal * (1 - discount.percent/100)) : subtotal).toLocaleString()}
+              </span>
             </div>
             <p className="text-[10px] text-secondary tracking-wide italic leading-normal">Taxes, shipping, and promotional reductions are finalized inside the secure checkout.</p>
             <button 
