@@ -11,6 +11,7 @@ const inventoryRoutes = require('./routes/inventory');
 const discountsRoutes = require('./routes/discounts');
 const settingsRoutes = require('./routes/settings');
 const transactionsRoutes = require('./routes/transactions');
+const activityRoutes = require('./routes/activity');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -27,6 +28,7 @@ app.use('/api/inventory', inventoryRoutes);
 app.use('/api/discounts', discountsRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/transactions', transactionsRoutes);
+app.use('/api/activity', activityRoutes);
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 

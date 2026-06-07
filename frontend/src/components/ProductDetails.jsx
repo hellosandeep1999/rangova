@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { PRODUCTS } from '../data/products';
+// Using products passed as prop
 
-export default function ProductDetails({ navigateTo, addToCart, selectedProductId, viewProductDetails }) {
+export default function ProductDetails({ navigateTo, addToCart, selectedProductId, viewProductDetails, products = [] }) {
   // Find active product
-  const prod = PRODUCTS.find(p => p.id === selectedProductId) || PRODUCTS.find(p => p.id === 'jaipur-trench') || PRODUCTS[0];
+  const prod = products.find(p => p.id === selectedProductId) || products[0] || {};
 
   // Default color setup
   const initialColor = prod.colors?.[0] || 'Warm Ivory';
@@ -62,10 +62,12 @@ export default function ProductDetails({ navigateTo, addToCart, selectedProductI
   };
 
   // Recommendations: exclude current product
-  const recommendations = PRODUCTS.filter(p => p.id !== prod.id);
+  const recommendations = products.filter(p => p.id !== prod.id);
 
   // Simulated original price if none exists to display the attractive crossed-out discount
-  const originalPrice = prod.originalPrice || Math.round(prod.price * 1.35);
+  const originalPrice = prod.originalPrice || (prod.price ? Math.round(prod.price * 1.35) : 0);
+
+  if (!prod.id) return <div className="p-10 text-center">Loading product...</div>;
 
   return (
     <div className="pt-6 pb-20 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto text-left font-body-md relative">

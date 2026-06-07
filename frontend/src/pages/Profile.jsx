@@ -73,7 +73,7 @@ export default function Profile({ navigateTo, currentUser, setCurrentUser, trigg
               </div>
               <div>
                 <label className="font-label-caps text-[10px] text-secondary tracking-wider block mb-2 uppercase">Mobile Number</label>
-                <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="e.g. +91 98765 43210" className="w-full bg-white border border-outline-variant/50 px-4 py-3 text-sm focus:border-primary focus:ring-0" />
+                <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} required placeholder="e.g. +91 98765 43210" className="w-full bg-white border border-outline-variant/50 px-4 py-3 text-sm focus:border-primary focus:ring-0" />
               </div>
               <button type="submit" className="bg-primary text-white font-label-caps text-xs uppercase px-8 py-3 tracking-widest hover:bg-secondary transition-colors cursor-pointer border-none">Save Changes</button>
             </form>

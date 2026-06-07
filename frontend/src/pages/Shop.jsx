@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-export default function Shop({ PRODUCTS, navigateTo, addToCart, viewProductDetails }) {
+export default function Shop({ PRODUCTS, CATEGORIES, navigateTo, addToCart, viewProductDetails }) {
   const [categoryFilter, setCategoryFilter] = useState('All');
   const [searchFilter, setSearchFilter] = useState('');
   const [sortOrder, setSortOrder] = useState('Featured');
@@ -24,13 +24,15 @@ export default function Shop({ PRODUCTS, navigateTo, addToCart, viewProductDetai
       return 0;
     });
 
+  const categoryNames = ['All', ...(CATEGORIES ? CATEGORIES.map(c => c.name) : [])];
+
   return (
     <div className="pt-8 pb-20 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto text-left">
       <h1 className="font-headline-xl text-[32px] md:text-[48px] text-primary mb-8 text-center">All Collections</h1>
 
       {/* Category tabs */}
       <div className="flex overflow-x-auto no-scrollbar space-x-6 md:space-x-10 pb-5 justify-start md:justify-center border-b border-outline-variant/20 mb-10">
-        {['All', 'Co-ords', 'Dresses', 'Shirts', 'Skirts', 'Tops'].map(cat => (
+        {categoryNames.map(cat => (
           <button
             key={cat}
             onClick={() => setCategoryFilter(cat)}

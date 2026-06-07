@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const supabase = require('../supabase');
 const { adminAuth } = require('../middleware/adminAuth');
+const { logActivity } = require('../utils/logger');
 
 // GET all orders (admin)
 router.get('/', adminAuth, async (req, res) => {
@@ -45,6 +46,10 @@ router.patch('/:id/status', adminAuth, async (req, res) => {
   const { status } = req.body;
   const { data, error } = await supabase.from('orders').update({ status }).eq('id', req.params.id).select().single();
   if (error) return res.status(500).json({ error: error.message });
+  
+  // Log activity
+  logActivity(req.user?.username, 'Update Order Status', `Updated Order #${req.params.id.slice(0, 8)} status to ${status}`);
+  
   res.json(data);
 });
 

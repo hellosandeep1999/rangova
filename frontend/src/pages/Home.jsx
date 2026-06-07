@@ -18,13 +18,6 @@ const HERO_SLIDES = [
   },
 ];
 
-const CATEGORIES = [
-  { title: 'Co-ords',  idx: '01', img: 'https://lh3.googleusercontent.com/aida/ADBb0ugk91uMet-3VnW2R6iGpTl_yEcn2JHZWLwtILh3ope71QZ9hwsprV-cg3o8dJPjDR2X6xKTqeqM5NiBGITXBkqQYLxhCtDFMS449FEjuFeFnnEWeYDZiWvawZLK7Opb_JkJWsvD73pqqC4UgaG12JkrRofSRG7G4LZJqV0hIu9ixsKedmHrOsBT8tj1WnqmAthsRHBPKAx-N9yc6HG0eXBsXRn6ruhbdb7eyEHw0PN1VBIKdwd0scj7_A' },
-  { title: 'Dresses',  idx: '02', img: 'https://lh3.googleusercontent.com/aida/ADBb0ugYGboZgWz32IDgG53pkXDhgNdUZFaFOjcja6nLntZTykYzrg8QrY9SJnZm1ii8aCHkjSv1IS0-trIE7HD27TsZRcwwAPQlBmzPZaMkHlIgZ8oo98o3YWsNbfqnS73ZtVxa9bOOLEZYdFjBqH3MD5skpPthtRQKx-4wlPRxPcHQ4WFqeFGrssrCnRmcuxXJmCLIaJ6XhZqDI7meNZWkp-wNg0lFQ78LuFmzay7xd6CDcHYKed2QVrD9' },
-  { title: 'Shirts',   idx: '03', img: 'https://lh3.googleusercontent.com/aida/ADBb0ujKEAgF3tjBMIMFSdKuFMYTIWfbih_A2khRTp-nsiLwXFgyqKuzEW_pZ0AP_RXDal5H9BRcvSkxz73r0d3VULeOnEdBaQXHsWyFSI-Ix2VoRl3cE57oZmiyEZDDmjArfV4L0-9VHyPRqf5T7NpXg10sNLkQSkkBxVSKCrCQKRmub1LA3B5t21FgmT9RpzQZzoZyhBF3LeJDSvinxE9HcSRyMwsyuRjHFcFRyH-Ol1J9CGn7WYpQB4Dhgw' },
-  { title: 'Skirts',   idx: '04', img: 'https://lh3.googleusercontent.com/aida/ADBb0uhM6Pq6vNQH2-aiTRcQNt1HTfmCIfolJs5WvRnRPCPcLGATDpsu7jjYK0GiLiLEMsjAb0AeJ-DRGIOdWAXsQ9hFdp1sCgHERVw5uOEnLmW67zDH55sKWMsuJ1ds6g84YJ0wECPAsRfPdo3Pi8cX4SGCFqr2qki2oHe587igji9tKX3vIU0aARxiTRBfzpfyoVdTaGWH2z-hpBhytnOO82IUYgQuL53YtRLBkdGgRhkDZiiyPbErAEi8LQ' },
-  { title: 'Tops',     idx: '05', img: 'https://lh3.googleusercontent.com/aida/ADBb0ugjDUxBKpvtbeftQMJvQjNkJA9T8YwSfO1hnezXA57ehNdRXVwuoANKG_VxBlRWsJ41-WZeQg1GnEJ4uSVWSmeTEw-skEkgRZzBCrQBrUE3eLRPwTEUD9X22aGU6saxZCz9kdYwnXwdP15IZeW1eSnW_Vr1Eyi-vPnRM3w7o9OVyAL6niv4RcElvJqEeh8kGN1W9tEr6roqE9v0CCnnpI1Rvte5_n0-wMH8h-BUhYXRyXJpgK5w830G2w' },
-];
 
 const TESTIMONIALS = [
   {
@@ -67,7 +60,7 @@ const TEAM_REELS = [
   { src: 'https://videos.pexels.com/video-files/4098942/4098942-sd_360_640_25fps.mp4', label: 'Packing & Care' },
 ];
 
-export default function Home({ navigateTo, setCategoryFilter, addToCart, PRODUCTS, viewProductDetails }) {
+export default function Home({ navigateTo, setCategoryFilter, addToCart, PRODUCTS, CATEGORIES, viewProductDetails }) {
   const [heroIdx, setHeroIdx] = useState(0);
   const heroTimer = useRef(null);
   const catRef = useRef(null);
@@ -170,24 +163,26 @@ export default function Home({ navigateTo, setCategoryFilter, addToCart, PRODUCT
           className="flex gap-5 md:gap-7 overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory px-margin-mobile md:px-margin-desktop pb-10"
           style={{ WebkitOverflowScrolling: 'touch' }}
         >
-          {CATEGORIES.map((cat, i) => (
+          {CATEGORIES && CATEGORIES.map((cat, i) => (
             <button
               key={i}
-              onClick={() => { setCategoryFilter(cat.title); navigateTo('shop'); }}
+              onClick={() => { setCategoryFilter(cat.name); navigateTo('shop'); }}
               className="group flex flex-col items-center cursor-pointer text-center bg-transparent border-none p-0 snap-start flex-shrink-0"
               style={{ width: '175px', minWidth: '160px' }}
             >
-              <div className="relative w-full aspect-[3/4] rounded-t-full overflow-hidden mb-3 shadow-md group-hover:shadow-xl transition-all duration-500">
-                <img
-                  alt={cat.title}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  src={cat.img}
-                />
+              <div className="relative w-full aspect-[3/4] rounded-t-full overflow-hidden mb-3 shadow-md group-hover:shadow-xl transition-all duration-500 bg-surface-container-low">
+                {cat.image_url && (
+                  <img
+                    alt={cat.name}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    src={cat.image_url}
+                  />
+                )}
                 <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               </div>
-              <span className="font-label-caps text-[9px] text-muted-terracotta mb-0.5 tracking-widest">{cat.idx}</span>
+              <span className="font-label-caps text-[9px] text-muted-terracotta mb-0.5 tracking-widest">{String(i + 1).padStart(2, '0')}</span>
               <span className="font-headline-sm text-[17px] md:text-[20px] text-primary group-hover:text-muted-terracotta transition-colors duration-300">
-                {cat.title}
+                {cat.name}
               </span>
             </button>
           ))}

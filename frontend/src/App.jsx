@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getProducts } from './lib/api';
+import { getProducts, getCategories } from './lib/api';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import CartDrawer from './components/CartDrawer';
@@ -19,17 +19,39 @@ function App() {
   const [currentPage, setCurrentPage] = useState(window.location.pathname.replace('/', '') || 'home');
   const [cart, setCart] = useState([]);
   const [PRODUCTS, setPRODUCTS] = useState([]);
+  const [CATEGORIES, setCATEGORIES] = useState([]);
 
   useEffect(() => {
-    const fetchProds = async () => {
+    const fetchData = async () => {
       try {
-        const data = await getProducts();
-        if (data) setPRODUCTS(data);
+        const [prodsData, catsData] = await Promise.all([
+          getProducts().catch(() => null),
+          getCategories().catch(() => null)
+        ]);
+
+        if (prodsData) {
+          const mappedProducts = prodsData.map(p => ({
+            ...p,
+            imageMain: p.image_main || p.imageMain,
+            imageHover: p.image_hover || p.imageHover,
+            originalPrice: p.original_price || p.originalPrice,
+            inStock: p.in_stock !== undefined ? p.in_stock : p.inStock,
+            colorsHex: p.colors_hex || p.colorsHex,
+            imagesByColor: p.images_by_color || p.imagesByColor
+          }));
+          setPRODUCTS(mappedProducts);
+        }
+
+        if (catsData) {
+          // DB uses 'title' column; map it to 'name' for all consumer components
+          const mappedCats = catsData.map(c => ({ ...c, name: c.title || c.name }));
+          setCATEGORIES(mappedCats);
+        }
       } catch (e) {
-        console.error('Error fetching products', e);
+        console.error('Error fetching data', e);
       }
     };
-    fetchProds();
+    fetchData();
   }, []);
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -103,7 +125,7 @@ function App() {
   const subtotal = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
   const totalItemsCount = cart.reduce((acc, item) => acc + item.quantity, 0);
 
-  const sharedProps = { navigateTo, triggerNotification, addToCart, PRODUCTS, viewProductDetails };
+  const sharedProps = { navigateTo, triggerNotification, addToCart, PRODUCTS, CATEGORIES, viewProductDetails };
 
   return (
     <div className="bg-warm-ivory text-on-surface antialiased min-h-screen flex flex-col font-body-md relative selection:bg-muted-terracotta selection:text-white">
@@ -156,7 +178,7 @@ function App() {
           <Search {...sharedProps} />
         )}
         {currentPage === 'product-details' && (
-          <ProductDetails navigateTo={navigateTo} addToCart={addToCart} selectedProductId={selectedProductId} viewProductDetails={viewProductDetails} />
+          <ProductDetails navigateTo={navigateTo} addToCart={addToCart} selectedProductId={selectedProductId} viewProductDetails={viewProductDetails} products={PRODUCTS} />
         )}
         {currentPage === 'our-story' && (
           <OurStory navigateTo={navigateTo} />

@@ -1,4 +1,10 @@
+import { createClient } from '@supabase/supabase-js';
+
 const BASE = 'http://localhost:3001/api';
+
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 function getToken() {
   return sessionStorage.getItem('rangova_admin_token');
@@ -6,6 +12,31 @@ function getToken() {
 
 function authHeaders() {
   return { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` };
+}
+
+async function handleResponse(res) {
+  if (res.status === 401 || res.status === 403) {
+    adminLogout();
+    throw new Error('Token expired. Please log in again.');
+  }
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+// ── STORAGE ───────────────────────────────────────────
+export async function uploadFileToSupabase(bucket, file) {
+  const fileExt = file.name.split('.').pop();
+  const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
+  const filePath = `${fileName}`;
+
+  const { data, error } = await supabase.storage.from(bucket).upload(filePath, file);
+
+  if (error) {
+    throw error;
+  }
+
+  const { data: publicData } = supabase.storage.from(bucket).getPublicUrl(filePath);
+  return publicData.publicUrl;
 }
 
 // ── AUTH ──────────────────────────────────────────────
@@ -37,20 +68,17 @@ export async function getProducts() {
 
 export async function createProduct(data) {
   const res = await fetch(`${BASE}/products`, { method: 'POST', headers: authHeaders(), body: JSON.stringify(data) });
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
+  return handleResponse(res);
 }
 
 export async function updateProduct(id, data) {
   const res = await fetch(`${BASE}/products/${id}`, { method: 'PUT', headers: authHeaders(), body: JSON.stringify(data) });
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
+  return handleResponse(res);
 }
 
 export async function deleteProduct(id) {
   const res = await fetch(`${BASE}/products/${id}`, { method: 'DELETE', headers: authHeaders() });
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
+  return handleResponse(res);
 }
 
 // ── CATEGORIES ────────────────────────────────────────
@@ -61,26 +89,24 @@ export async function getCategories() {
 
 export async function createCategory(data) {
   const res = await fetch(`${BASE}/categories`, { method: 'POST', headers: authHeaders(), body: JSON.stringify(data) });
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
+  return handleResponse(res);
 }
 
 export async function updateCategory(id, data) {
   const res = await fetch(`${BASE}/categories/${id}`, { method: 'PUT', headers: authHeaders(), body: JSON.stringify(data) });
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
+  return handleResponse(res);
 }
 
 export async function deleteCategory(id) {
   const res = await fetch(`${BASE}/categories/${id}`, { method: 'DELETE', headers: authHeaders() });
-  return res.json();
+  return handleResponse(res);
 }
 
 // ── ORDERS ────────────────────────────────────────────
 export async function getOrders(status = '') {
   const url = status ? `${BASE}/orders?status=${status}` : `${BASE}/orders`;
   const res = await fetch(url, { headers: authHeaders() });
-  return res.json();
+  return handleResponse(res);
 }
 
 export async function placeOrder(data) {
@@ -91,8 +117,7 @@ export async function placeOrder(data) {
 
 export async function updateOrderStatus(id, status) {
   const res = await fetch(`${BASE}/orders/${id}/status`, { method: 'PATCH', headers: authHeaders(), body: JSON.stringify({ status }) });
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
+  return handleResponse(res);
 }
 
 export function getOrderSlipUrl(id) {
@@ -102,12 +127,12 @@ export function getOrderSlipUrl(id) {
 // ── CUSTOMERS ─────────────────────────────────────────
 export async function getCustomers() {
   const res = await fetch(`${BASE}/customers`, { headers: authHeaders() });
-  return res.json();
+  return handleResponse(res);
 }
 
 export async function getCustomerOrders(id) {
   const res = await fetch(`${BASE}/customers/${id}/orders`, { headers: authHeaders() });
-  return res.json();
+  return handleResponse(res);
 }
 
 // ── INVENTORY ─────────────────────────────────────────
@@ -174,4 +199,10 @@ export async function getSetting(key) {
 export async function updateSetting(key, value) {
   const res = await fetch(`${BASE}/settings/${key}`, { method: 'PUT', headers: authHeaders(), body: JSON.stringify({ value }) });
   return res.json();
+}
+
+// ── ACTIVITY LOGS ─────────────────────────────────────
+export async function getActivityLogs() {
+  const res = await fetch(`${BASE}/activity`, { headers: authHeaders() });
+  return handleResponse(res);
 }
