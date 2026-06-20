@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { createProduct, updateProduct, deleteProduct } from '../../lib/api';
+import ConfirmModal from '../ConfirmModal';
 
 // Hardcoded color palette
 const COLOR_PALETTE = {
@@ -14,7 +15,31 @@ const COLOR_PALETTE = {
   'Midnight Black': '#121212',
   'Rust Orange': '#B7410E',
   'Indigo': '#4B0082',
-  'Cream White': '#FDFBF7'
+  'Cream White': '#FDFBF7',
+  'Saffron': '#FF9933',
+  'Turmeric Yellow': '#FFC30B',
+  'Peacock Blue': '#005E7C',
+  'Lotus Pink': '#FFB6C1',
+  'Marigold': '#FF7E00',
+  'Crimson Red': '#DC143C',
+  'Emerald': '#50C878',
+  'Mustard': '#FFDB58',
+  'Olive': '#808000',
+  'Burgundy': '#800020',
+  'Teal': '#008080',
+  'Magenta': '#FF00FF',
+  'Plum': '#8E4585',
+  'Coral': '#FF7F50',
+  'Mint Green': '#98FF98',
+  'Lavender': '#E6E6FA',
+  'Peach': '#FFE5B4',
+  'Sand': '#C2B280',
+  'Coffee': '#6F4E37',
+  'Sky Blue': '#87CEEB',
+  'Navy Blue': '#000080',
+  'Rose Gold': '#B76E79',
+  'Silver': '#C0C0C0',
+  'Bronze': '#CD7F32'
 };
 
 export default function AdminProducts({ products, setProducts, categories, triggerNotification, onRefresh, loading }) {
@@ -24,17 +49,49 @@ export default function AdminProducts({ products, setProducts, categories, trigg
   const [isUploading, setIsUploading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [itemToDelete, setItemToDelete] = useState(null);
+  const [visibleCount, setVisibleCount] = useState(20);
 
   const [productForm, setProductForm] = useState({
     title: '', category: '', price: '', original_price: '', 
     badge: '', sizes: '', colors: [], colors_hex: {}, images_by_color: {},
-    image_main: '', image_hover: '', in_stock: true, description: ''
+    image_main: '', image_hover: '', in_stock: true, description: '', details_care: '', shipping_info: ''
   });
 
   // Local state for files pending upload
   const [pendingMainImage, setPendingMainImage] = useState(null);
   const [pendingHoverImage, setPendingHoverImage] = useState(null);
   const [pendingColorImages, setPendingColorImages] = useState({}); // { colorName: [file1, file2] }
+
+  const insertMarkdown = (field, prefix, suffix = '') => {
+    const textarea = document.getElementById(`textarea-${field}`);
+    if (!textarea) return;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = productForm[field] || '';
+    const selectedText = text.substring(start, end);
+    const newText = text.substring(0, start) + prefix + selectedText + suffix + text.substring(end);
+    setProductForm(prev => ({ ...prev, [field]: newText }));
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start + prefix.length, start + prefix.length + selectedText.length);
+    }, 0);
+  };
+
+  const renderRichTextEditor = (label, field, required = false) => (
+    <div className="md:col-span-2">
+      <div className="flex justify-between items-end mb-1">
+        <label className="block font-label-caps text-[10px] tracking-widest uppercase">{label} {required && <span style={{ color: '#9B3018' }}>*</span>}</label>
+        <div className="flex gap-1">
+          <button type="button" onClick={() => insertMarkdown(field, '**', '**')} className="p-1 border border-outline-variant/30 text-[10px] font-bold w-6 h-6 flex items-center justify-center bg-surface-container-low hover:bg-surface-variant cursor-pointer">B</button>
+          <button type="button" onClick={() => insertMarkdown(field, '_', '_')} className="p-1 border border-outline-variant/30 text-[10px] italic w-6 h-6 flex items-center justify-center bg-surface-container-low hover:bg-surface-variant cursor-pointer">I</button>
+          <button type="button" onClick={() => insertMarkdown(field, '\\n- ')} className="p-1 border border-outline-variant/30 text-[10px] w-6 h-6 flex items-center justify-center bg-surface-container-low hover:bg-surface-variant cursor-pointer">•</button>
+        </div>
+      </div>
+      <textarea id={`textarea-${field}`} required={required} rows="4" className="w-full border border-outline-variant/30 p-2 text-sm bg-transparent outline-none focus:border-primary font-mono" value={productForm[field] || ''} onChange={e => setProductForm({...productForm, [field]: e.target.value})}></textarea>
+      <p className="text-[9px] text-secondary mt-1">Markdown supported. Use **bold** and - bullets.</p>
+    </div>
+  );
 
   const handleOpenProductModal = (product = null) => {
     if (product) {
@@ -52,14 +109,16 @@ export default function AdminProducts({ products, setProducts, categories, trigg
         image_main: product.image_main || product.imageMain || '',
         image_hover: product.image_hover || product.imageHover || '',
         in_stock: product.in_stock !== undefined ? product.in_stock : (product.inStock !== undefined ? product.inStock : true),
-        description: product.description || ''
+        description: product.description || '',
+        details_care: product.details_care || product.detailsCare || '',
+        shipping_info: product.shipping_info || product.shippingInfo || ''
       });
     } else {
       setEditingProduct(null);
       setProductForm({
         title: '', category: '', price: '', original_price: '', 
         badge: '', sizes: '', colors: [], colors_hex: {}, images_by_color: {},
-        image_main: '', image_hover: '', in_stock: true, description: ''
+        image_main: '', image_hover: '', in_stock: true, description: '', details_care: '', shipping_info: ''
       });
     }
     setPendingMainImage(null);
@@ -267,7 +326,9 @@ export default function AdminProducts({ products, setProducts, categories, trigg
         image_main: finalMainImage,
         image_hover: finalHoverImage,
         in_stock: productForm.in_stock,
-        description: productForm.description
+        description: productForm.description,
+        details_care: productForm.details_care,
+        shipping_info: productForm.shipping_info
       };
 
       if (editingProduct) {
@@ -290,23 +351,47 @@ export default function AdminProducts({ products, setProducts, categories, trigg
     }
   };
 
-  const handleDeleteProduct = async (id) => {
-    if (window.confirm('Are you sure you want to delete this product?')) {
-      try {
-        await deleteProduct(id);
-        setProducts(products.filter(p => p.id !== id));
-        if (selectedProduct?.id === id) setSelectedProduct(null);
-        triggerNotification('Product deleted successfully');
-      } catch (err) {
-        triggerNotification('Error deleting product');
-      }
+  const handleDeleteProduct = (id) => {
+    setItemToDelete(id);
+  };
+
+  const confirmDeleteProduct = async () => {
+    if (!itemToDelete) return;
+    try {
+      await deleteProduct(itemToDelete);
+      setProducts(products.filter(p => p.id !== itemToDelete));
+      if (selectedProduct?.id === itemToDelete) setSelectedProduct(null);
+      triggerNotification('Product deleted successfully');
+    } catch (err) {
+      triggerNotification('Error deleting product');
+    } finally {
+      setItemToDelete(null);
     }
   };
 
-  const filteredProducts = products.filter(p => p.title.toLowerCase().includes(searchQuery.toLowerCase()));
+  const filteredProducts = useMemo(() => 
+    products.filter(p => p.title.toLowerCase().includes(searchQuery.toLowerCase())),
+  [products, searchQuery]);
+
+  React.useEffect(() => {
+    setVisibleCount(20);
+  }, [searchQuery]);
+
+  const displayedProducts = useMemo(() => filteredProducts.slice(0, visibleCount), [filteredProducts, visibleCount]);
+
+  const loadMoreRef = React.useRef(null);
+  React.useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && visibleCount < filteredProducts.length) {
+        setVisibleCount(prev => prev + 20);
+      }
+    });
+    if (loadMoreRef.current) observer.observe(loadMoreRef.current);
+    return () => observer.disconnect();
+  }, [visibleCount, filteredProducts.length]);
 
   return (
-    <div className="flex gap-4 h-full">
+    <div className="flex gap-4 h-full overflow-hidden">
       {/* Main Panel */}
       <div className={`flex flex-col transition-all duration-300 ${selectedProduct ? 'flex-1 min-w-0' : 'w-full'}`}>
         <div className="flex justify-between items-center mb-6">
@@ -342,8 +427,8 @@ export default function AdminProducts({ products, setProducts, categories, trigg
           />
         </div>
 
-        <div className="bg-white border border-outline-variant/30 rounded-sm shadow-sm overflow-hidden">
-          <div className="overflow-x-auto">
+        <div className="bg-white border border-outline-variant/30 rounded-sm shadow-sm overflow-hidden flex-1 flex flex-col">
+          <div className="overflow-auto flex-1">
             <table className="w-full text-left">
               <thead className="bg-surface-variant/30 border-b border-outline-variant/30 font-label-caps text-[10px] text-secondary tracking-widest uppercase">
                 <tr>
@@ -356,7 +441,7 @@ export default function AdminProducts({ products, setProducts, categories, trigg
                 </tr>
               </thead>
               <tbody className="divide-y divide-outline-variant/10 text-sm">
-                {filteredProducts.map(prod => (
+                {displayedProducts.map(prod => (
                   <tr 
                     key={prod.id} 
                     onClick={() => setSelectedProduct(selectedProduct?.id === prod.id ? null : prod)}
@@ -388,11 +473,16 @@ export default function AdminProducts({ products, setProducts, categories, trigg
                     <td colSpan="6" className="py-8 text-center text-secondary">No products found.</td>
                   </tr>
                 )}
+                {visibleCount < filteredProducts.length && (
+                  <tr ref={loadMoreRef}>
+                    <td colSpan="6" className="py-4 text-center text-secondary">Loading more...</td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
         </div>
-        <p className="mt-2 text-xs text-secondary">{filteredProducts.length} product{filteredProducts.length !== 1 ? 's' : ''} • Click a row to view details</p>
+        <p className="mt-2 text-xs text-secondary">Showing {displayedProducts.length} of {filteredProducts.length} product{filteredProducts.length !== 1 ? 's' : ''} • Click a row to view details</p>
       </div>
 
       {/* Right Detail Panel */}
@@ -544,10 +634,9 @@ export default function AdminProducts({ products, setProducts, categories, trigg
                   <input required className="w-full border border-outline-variant/30 p-2 text-sm bg-transparent outline-none focus:border-primary" placeholder="XS, S, M, L, XL" value={productForm.sizes} onChange={e => setProductForm({...productForm, sizes: e.target.value})} />
                 </div>
 
-                <div className="col-span-1 md:col-span-2">
-                  <label className="block font-label-caps text-[10px] tracking-widest uppercase mb-1">Description <span style={{ color: '#9B3018' }}>*</span></label>
-                  <textarea required rows="3" className="w-full border border-outline-variant/30 p-2 text-sm bg-transparent outline-none focus:border-primary" value={productForm.description} onChange={e => setProductForm({...productForm, description: e.target.value})}></textarea>
-                </div>
+                {renderRichTextEditor('Description', 'description', true)}
+                {renderRichTextEditor('Details & Care', 'details_care')}
+                {renderRichTextEditor('Shipping Info', 'shipping_info')}
               </div>
 
               {/* Main Media Uploads */}
@@ -659,6 +748,13 @@ export default function AdminProducts({ products, setProducts, categories, trigg
           </div>
         </div>
       )}
+      {/* Confirm Delete Modal */}
+      <ConfirmModal
+        isOpen={!!itemToDelete}
+        onConfirm={confirmDeleteProduct}
+        onCancel={() => setItemToDelete(null)}
+        message="Are you sure you want to delete this product? This action cannot be undone."
+      />
     </div>
   );
 }

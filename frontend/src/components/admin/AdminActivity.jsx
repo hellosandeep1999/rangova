@@ -5,6 +5,7 @@ export default function AdminActivity({ triggerNotification, onRefresh, loading 
   const [logs, setLogs] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [localLoading, setLocalLoading] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(20);
 
   const fetchLogs = async () => {
     try {
@@ -39,6 +40,23 @@ export default function AdminActivity({ triggerNotification, onRefresh, loading 
     });
   }, [logs, searchQuery]);
 
+  React.useEffect(() => {
+    setVisibleCount(20);
+  }, [searchQuery]);
+
+  const displayedLogs = useMemo(() => filteredLogs.slice(0, visibleCount), [filteredLogs, visibleCount]);
+
+  const loadMoreRef = React.useRef(null);
+  React.useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && visibleCount < filteredLogs.length) {
+        setVisibleCount(prev => prev + 20);
+      }
+    });
+    if (loadMoreRef.current) observer.observe(loadMoreRef.current);
+    return () => observer.disconnect();
+  }, [visibleCount, filteredLogs.length]);
+
   return (
     <div className="flex-grow flex flex-col bg-white border border-outline-variant/30 rounded-lg shadow-sm overflow-hidden text-left">
       <div className="p-4 md:p-6 border-b border-outline-variant/20 flex flex-col md:flex-row justify-between items-stretch md:items-center gap-4">
@@ -72,7 +90,7 @@ export default function AdminActivity({ triggerNotification, onRefresh, loading 
           <div className="p-12 text-center text-secondary">No activity logs found.</div>
         ) : (
           <div className="divide-y divide-outline-variant/10">
-            {filteredLogs.map(log => (
+            {displayedLogs.map(log => (
               <div key={log.id} className="p-4 md:p-6 hover:bg-surface-container-low transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="space-y-1">
                   <div className="flex items-center gap-3">
@@ -95,8 +113,16 @@ export default function AdminActivity({ triggerNotification, onRefresh, loading 
                 </div>
               </div>
             ))}
+            {visibleCount < filteredLogs.length && (
+              <div ref={loadMoreRef} className="p-4 text-center text-secondary text-sm">
+                Loading more...
+              </div>
+            )}
           </div>
         )}
+      </div>
+      <div className="p-2 text-xs text-secondary border-t border-outline-variant/20 bg-surface-container-low">
+        Showing {displayedLogs.length} of {filteredLogs.length} log{filteredLogs.length !== 1 ? 's' : ''}
       </div>
     </div>
   );

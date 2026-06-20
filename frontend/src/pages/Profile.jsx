@@ -14,6 +14,22 @@ export default function Profile({ navigateTo, currentUser, setCurrentUser, trigg
   const [phone, setPhone] = useState(currentUser.phone || '');
   const [name, setName] = useState(currentUser.name || '');
 
+  // Orders state
+  const [dbOrders, setDbOrders] = useState([]);
+  const [loadingOrders, setLoadingOrders] = useState(false);
+
+  React.useEffect(() => {
+    if (activeTab === 'orders' && currentUser?.email) {
+      setLoadingOrders(true);
+      import('../lib/api').then(({ getOrdersByEmail }) => {
+        getOrdersByEmail(currentUser.email)
+          .then(data => setDbOrders(Array.isArray(data) ? data : []))
+          .catch(e => console.error(e))
+          .finally(() => setLoadingOrders(false));
+      });
+    }
+  }, [activeTab, currentUser]);
+
   const saveDetails = (e) => {
     e.preventDefault();
     setCurrentUser({ ...currentUser, name, phone });
@@ -130,20 +146,33 @@ export default function Profile({ navigateTo, currentUser, setCurrentUser, trigg
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-outline-variant/10 text-sm">
-                  {currentUser.orders.map(order => (
-                    <tr key={order.id} className="hover:bg-surface-container-low transition-colors">
-                      <td className="py-4 px-2 font-bold text-primary">{order.id}</td>
-                      <td className="py-4 px-2 text-secondary">{order.date}</td>
-                      <td className="py-4 px-2 text-secondary text-xs">{order.items}</td>
-                      <td className="py-4 px-2">
-                        <span className={`px-2 py-1 text-[10px] font-label-caps uppercase rounded-sm ${order.status === 'Delivered' ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'}`}>
-                          {order.status}
-                        </span>
-                      </td>
-                      <td className="py-4 px-2 text-right font-price-lg font-bold">₹{order.total.toLocaleString()}</td>
-                    </tr>
-                  ))}
-                  {currentUser.orders.length === 0 && (
+                  {loadingOrders ? (
+                    <tr><td colSpan="5" className="py-8 text-center text-secondary">Loading orders...</td></tr>
+                  ) : dbOrders.length > 0 ? (
+                    dbOrders.map(order => (
+                      <tr key={order.id} className="hover:bg-surface-container-low transition-colors">
+                        <td className="py-4 px-2 font-bold text-primary">
+                          <span className="font-mono text-xs">{order.id}</span>
+                        </td>
+                        <td className="py-4 px-2 text-secondary whitespace-nowrap text-xs">
+                          {new Date(order.created_at).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' })}
+                        </td>
+                        <td className="py-4 px-2 text-secondary text-xs">
+                          {Array.isArray(order.items) ? order.items.map(i => `${i.quantity}x ${i.title}`).join(', ') : '-'}
+                        </td>
+                        <td className="py-4 px-2">
+                          <span className={`px-2 py-1 text-[10px] font-label-caps uppercase tracking-widest font-bold rounded-sm ${
+                            order.status === 'Delivered' ? 'bg-green-100 text-green-800' : 
+                            order.status === 'Cancelled' ? 'bg-red-100 text-red-800' :
+                            'bg-orange-100 text-orange-800'
+                          }`}>
+                            {order.status}
+                          </span>
+                        </td>
+                        <td className="py-4 px-2 text-right font-price-lg font-bold">₹{order.total.toLocaleString('en-IN')}</td>
+                      </tr>
+                    ))
+                  ) : (
                     <tr><td colSpan="5" className="py-8 text-center text-secondary">No orders found.</td></tr>
                   )}
                 </tbody>

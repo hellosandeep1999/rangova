@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 
-export default function Shop({ PRODUCTS, CATEGORIES, navigateTo, addToCart, viewProductDetails }) {
-  const [categoryFilter, setCategoryFilter] = useState('All');
+export default function Shop({ PRODUCTS, CATEGORIES, navigateTo, addToCart, viewProductDetails, categoryFilter, setCategoryFilter }) {
   const [searchFilter, setSearchFilter] = useState('');
   const [sortOrder, setSortOrder] = useState('Featured');
   const [showInStock, setShowInStock] = useState(true);
@@ -152,7 +151,16 @@ export default function Shop({ PRODUCTS, CATEGORIES, navigateTo, addToCart, view
                       ) : (
                         /* Quick-add button — only for in-stock items */
                         <button
-                          onClick={e => { e.stopPropagation(); addToCart(prod, prod.sizes?.[0] || 'S', prod.colors?.[0] || ''); }}
+                          onClick={e => { 
+                            e.stopPropagation(); 
+                            let sz = prod.sizes?.[0] || 'S';
+                            let col = prod.colors?.[0] || '';
+                            if (prod.inventory?.length > 0) {
+                              const avail = prod.inventory.find(inv => inv.stock_qty > 0);
+                              if (avail) { sz = avail.size || sz; col = avail.color || col; }
+                            }
+                            addToCart(prod, sz, col); 
+                          }}
                           className="absolute bottom-2 right-2 z-20 w-8 h-8 bg-primary text-white flex items-center justify-center hover:bg-muted-terracotta transition-colors duration-200 shadow border-none"
                           title="Quick Add"
                         >

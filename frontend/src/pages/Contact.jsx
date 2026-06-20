@@ -1,9 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { getAllSettings } from '../lib/api';
 
 export default function Contact({ navigateTo, triggerNotification, currentUser }) {
   const [subject, setSubject] = useState('General Inquiry');
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [settings, setSettings] = useState({});
+
+  useEffect(() => {
+    getAllSettings().then(setSettings).catch(console.error);
+  }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -35,12 +41,12 @@ export default function Contact({ navigateTo, triggerNotification, currentUser }
           <div className="space-y-4 pt-4 border-t border-outline-variant/30">
             <div>
               <span className="font-label-caps text-[10px] text-secondary tracking-widest block uppercase mb-1">Mailing Address</span>
-              <p className="text-xs text-primary font-medium">108, Craft Boulevard, Sector 5, Mansarovar, Jaipur, RJ - 302020</p>
+              <p className="text-xs text-primary font-medium whitespace-pre-line">{settings.company_address || '108, Craft Boulevard, Sector 5, Mansarovar, Jaipur, RJ - 302020'}</p>
             </div>
             <div>
               <span className="font-label-caps text-[10px] text-secondary tracking-widest block uppercase mb-1">Client Services</span>
-              <p className="text-xs text-primary font-medium">care@rangova.com</p>
-              <p className="text-xs text-primary font-medium">+91 141 409 8122</p>
+              <p className="text-xs text-primary font-medium">{settings.contact_email || 'care@rangova.com'}</p>
+              {settings.support_phone && <p className="text-xs text-primary font-medium mt-1">Support: {settings.support_phone}</p>}
             </div>
             <div>
               <span className="font-label-caps text-[10px] text-secondary tracking-widest block uppercase mb-1">Hours</span>

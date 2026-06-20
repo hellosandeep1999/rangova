@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { getDiscounts, createDiscount, updateDiscount, deleteDiscount } from '../../lib/api';
+import ConfirmModal from '../ConfirmModal';
 
 export default function AdminDiscounts({ triggerNotification, onRefresh, loading }) {
   const [discountsList, setDiscountsList] = useState([]);
@@ -8,12 +9,14 @@ export default function AdminDiscounts({ triggerNotification, onRefresh, loading
   const [showAddModal, setShowAddModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [localLoading, setLocalLoading] = useState(false);
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
 
   // Forms
   const [addForm, setAddForm] = useState({
     code: '',
     text: '',
     percent: 10,
+    type: 'all_orders',
     active: true
   });
 
@@ -21,6 +24,7 @@ export default function AdminDiscounts({ triggerNotification, onRefresh, loading
     code: '',
     text: '',
     percent: 10,
+    type: 'all_orders',
     active: true
   });
 
@@ -62,6 +66,7 @@ export default function AdminDiscounts({ triggerNotification, onRefresh, loading
       code: item.code || '',
       text: item.text || '',
       percent: item.percent || 0,
+      type: item.type || 'all_orders',
       active: item.active !== undefined ? item.active : true
     });
   };
@@ -78,11 +83,12 @@ export default function AdminDiscounts({ triggerNotification, onRefresh, loading
         code: addForm.code.toUpperCase().trim(),
         text: addForm.text.trim(),
         percent: parseInt(addForm.percent) || 0,
+        type: addForm.type,
         active: addForm.active
       });
       triggerNotification('Discount code created successfully');
       setShowAddModal(false);
-      setAddForm({ code: '', text: '', percent: 10, active: true });
+      setAddForm({ code: '', text: '', percent: 10, type: 'all_orders', active: true });
       fetchDiscountsData();
     } catch (err) {
       triggerNotification(`Error creating discount: ${err.message || err}`);
@@ -100,6 +106,7 @@ export default function AdminDiscounts({ triggerNotification, onRefresh, loading
         code: editForm.code.toUpperCase().trim(),
         text: editForm.text.trim(),
         percent: parseInt(editForm.percent) || 0,
+        type: editForm.type,
         active: editForm.active
       });
       triggerNotification('Discount code updated successfully');
@@ -112,11 +119,11 @@ export default function AdminDiscounts({ triggerNotification, onRefresh, loading
     }
   };
 
-  const handleDeleteItem = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this discount code?')) return;
+  const handleDeleteItem = async () => {
+    if (!confirmDeleteId) return;
     try {
       setLocalLoading(true);
-      await deleteDiscount(id);
+      await deleteDiscount(confirmDeleteId);
       triggerNotification('Discount code deleted');
       setSelectedItem(null);
       fetchDiscountsData();
@@ -124,11 +131,12 @@ export default function AdminDiscounts({ triggerNotification, onRefresh, loading
       triggerNotification(`Error deleting discount: ${err.message || err}`);
     } finally {
       setLocalLoading(false);
+      setConfirmDeleteId(null);
     }
   };
 
   return (
-    <div className="flex-1 flex flex-col md:flex-row gap-6 overflow-hidden">
+    <div className="flex-1 flex flex-col md:flex-row gap-6 h-full overflow-hidden">
       {/* Left panel - Discounts Table */}
       <div className="flex-grow flex flex-col min-w-0 bg-white border border-outline-variant/30 rounded-lg shadow-sm">
         {/* Toolbar */}
@@ -176,6 +184,7 @@ export default function AdminDiscounts({ triggerNotification, onRefresh, loading
                 <tr className="border-b border-outline-variant/30 font-label-caps text-[10px] text-secondary tracking-wider uppercase bg-surface-container-low">
                   <th className="py-3 px-6">Code</th>
                   <th className="py-3 px-4">Description</th>
+                  <th className="py-3 px-4">Type</th>
                   <th className="py-3 px-4 text-center">Percentage</th>
                   <th className="py-3 px-4 text-center">Status</th>
                   <th className="py-3 px-6 text-right">Actions</th>
@@ -192,6 +201,7 @@ export default function AdminDiscounts({ triggerNotification, onRefresh, loading
                     >
                       <td className="py-4 px-6 font-bold text-primary tracking-wider uppercase">{item.code}</td>
                       <td className="py-4 px-4 text-secondary">{item.text || '-'}</td>
+                      <td className="py-4 px-4 text-secondary">{item.type === 'first_order' ? 'First Order Only' : 'All Orders'}</td>
                       <td className="py-4 px-4 text-center font-bold text-primary">{item.percent}%</td>
                       <td className="py-4 px-4 text-center">
                         <span className={`px-2.5 py-0.5 rounded text-[10px] font-label-caps tracking-widest uppercase font-bold ${item.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
@@ -200,7 +210,7 @@ export default function AdminDiscounts({ triggerNotification, onRefresh, loading
                       </td>
                       <td className="py-4 px-6 text-right" onClick={(e) => e.stopPropagation()}>
                         <button
-                          onClick={() => handleDeleteItem(item.id)}
+                          onClick={() => setConfirmDeleteId(item.id)}
                           className="text-muted-terracotta hover:text-red-700 bg-transparent border-none cursor-pointer"
                         >
                           <span className="material-symbols-outlined text-lg">delete</span>
@@ -258,6 +268,18 @@ export default function AdminDiscounts({ triggerNotification, onRefresh, loading
                 onChange={(e) => setEditForm({ ...editForm, percent: e.target.value })}
                 className="w-full border border-outline-variant/50 p-2.5 text-sm bg-transparent outline-none focus:border-primary"
               />
+            </div>
+
+            <div>
+              <label className="font-label-caps text-[10px] text-secondary tracking-wider block mb-2 uppercase">Discount Type</label>
+              <select
+                value={editForm.type}
+                onChange={(e) => setEditForm({ ...editForm, type: e.target.value })}
+                className="w-full border border-outline-variant/50 p-2.5 text-sm bg-transparent outline-none focus:border-primary"
+              >
+                <option value="all_orders">Applies to all orders</option>
+                <option value="first_order">Applies to first order only</option>
+              </select>
             </div>
 
             <div className="flex items-center gap-3 py-2">
@@ -334,6 +356,18 @@ export default function AdminDiscounts({ triggerNotification, onRefresh, loading
                 />
               </div>
 
+              <div>
+                <label className="font-label-caps text-[10px] text-secondary tracking-wider block mb-2 uppercase">Discount Type</label>
+                <select
+                  value={addForm.type}
+                  onChange={(e) => setAddForm({ ...addForm, type: e.target.value })}
+                  className="w-full border border-outline-variant/50 p-2.5 text-sm bg-transparent outline-none focus:border-primary"
+                >
+                  <option value="all_orders">Applies to all orders</option>
+                  <option value="first_order">Applies to first order only</option>
+                </select>
+              </div>
+
               <div className="flex items-center gap-3 py-2">
                 <input
                   type="checkbox"
@@ -365,6 +399,15 @@ export default function AdminDiscounts({ triggerNotification, onRefresh, loading
           </div>
         </div>
       )}
+      {/* Confirm Delete Modal */}
+      <ConfirmModal
+        isOpen={!!confirmDeleteId}
+        title="Delete Discount"
+        message="Are you sure you want to delete this discount code? This action cannot be undone."
+        confirmLabel="Delete Code"
+        onConfirm={handleDeleteItem}
+        onCancel={() => setConfirmDeleteId(null)}
+      />
     </div>
   );
 }

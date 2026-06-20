@@ -1,77 +1,130 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { getSetting, getTestimonials } from '../lib/api';
 
 const HERO_SLIDES = [
   {
-    img: 'https://lh3.googleusercontent.com/aida/ADBb0uhr49XTMjgFA5Q_UWWXRj1as2GqzGDTGBO17BYHstsY2y9e4VVz7rFebJfgOu6R_MfM3FaerXZ4CyNwQMWsBb-IUYOGYJLpaazVj1nKCjrFCao_4epboLVmUMCsnnMguo5N0cAhs641ty3l6h-O2PyD4w0Z7-tRioi4lDkHOHv7hbkyhaIDYE_L1Hcx5iMz227rK9vYhEoyoRDoaP7ndLN_yg7CWt48gSGwLvLsot-xNrgyO0vIzHrs',
+    img: '',
     headline: 'Modern Tradition',
     sub: 'Ancestral Craft, Contemporary Grace',
   },
   {
-    img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAuNw8hYoPckUEXbG1HurK3uNM3wR7cxf3-bytxiD-n9GjebK5kK5BaEEj1hmExCSi7fCh3zj96WwQYd9WjKSk4iGI112LaFgpplgQqiIjVW1fNDJhra9mBHlTwvfxf6ZNolxteYCDcqVq98c9_kFo6IO2ZjEbvHeFyVZC37me6TAEFtm8s80GwypZENuqWFefTcG0jobmWHxhWON9Se9zPDy8Hflk3kpJRvTY_pFEEyQeu_6RS3tRjKrW-pLFbbludN0h1uyNp0Q',
+    img: '',
     headline: 'The Jaipur Edit',
     sub: 'Hand-loomed Ahimsa Silk, Reimagined',
   },
   {
-    img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCl1HPXFCnM0MqV24xsmv_tpPOygjO3cbY_mVQmnrBc_a6iEH5m_Qo5_4RHv6EAOLLnfOS-8qCU179yBRE7mlNZp4nn2AAc9vACw7DilmlON36SK5zknpLQ558EcC8EsRktJm06EG2Qy9lMN1-2Te4A3DnFaMQ1dWmBruvgNjQMNLcHmwwWk_fIbc1rDLQ25QqoGnc3AP9FZCuiblM_iTA7vgiaP-kKMKasI1XUXJvBfxd898gsxNUB_R0cXB6IDa_wIK5mdpoIEQ',
+    img: '',
     headline: 'Born in Jaipur',
     sub: 'Dust, Craft & Quiet Luxury',
   },
 ];
-
 
 const TESTIMONIALS = [
   {
     name: 'Maya T.',
     role: 'Architect',
     quote: '"The tailoring is impeccable, but it\'s the fabric that feels alive. Wearing this set feels like stepping into a piece of art that understands movement."',
-    face: 'https://lh3.googleusercontent.com/aida/ADBb0uiif2rIlNDpO5fwoP2K_m1Smk9XB_R3QW-M-H98VGFKHYDGUog6QV8CTKcvKI7odfPg1cSKOL2gGgksdDtX087VXrFigMJomUzbXih_nZhqmV5za2l_N6XbDv1_a1PKWfRoHW04SVdtD_OfHRp5YOBwpFr4BXe1TWAJ_sUJ2IBOVgL0n7XPEAEZ38Ien61p8A6VFmnlBg1n3PjOZhXQ-vAFEL-p7PwqITii9nHTS830M-yZ5epJFIoH3Q'
+    face: ''
   },
   {
     name: 'Priya S.',
     role: 'Curator',
     quote: '"I appreciate the silence of the design. It doesn\'t shout, but the quality of the block print demands attention. Truly heirloom pieces."',
-    face: 'https://lh3.googleusercontent.com/aida/ADBb0ujZl2JB_RqrpgzRguTaNs2fBtmUdlyttv_qf8o5DcAZB9ik4Tgs_kt0s74KpZJGEH6SCkzibT9e4aoEx8QIiz3UdiSCOFTj0OgMVWHCIWbX1ui0cm_nsfH5GqCs9nyUexdIVrjNuwxAYN0aLHJxdce-hm-wYM8ZMaZDyFkL9o1vWYozmV19DZxWYqKIp_uvBNRCtsgcpGY7AM1bAIJf3f9eRn-lg6XvxVw7SGqFSYIoxVbNKQpJ7DDASg'
+    face: ''
   },
   {
     name: 'Ananya R.',
     role: 'Designer',
     quote: '"Every time I wear a Rangova piece I feel connected to something ancient and timeless. The block prints tell stories that words cannot."',
-    face: 'https://lh3.googleusercontent.com/aida/ADBb0uiif2rIlNDpO5fwoP2K_m1Smk9XB_R3QW-M-H98VGFKHYDGUog6QV8CTKcvKI7odfPg1cSKOL2gGgksdDtX087VXrFigMJomUzbXih_nZhqmV5za2l_N6XbDv1_a1PKWfRoHW04SVdtD_OfHRp5YOBwpFr4BXe1TWAJ_sUJ2IBOVgL0n7XPEAEZ38Ien61p8A6VFmnlBg1n3PjOZhXQ-vAFEL-p7PwqITii9nHTS830M-yZ5epJFIoH3Q'
+    face: ''
   }
 ];
 
-// Fashion reels using auto-play looping videos (portrait 9:16)
-// Using Pexels free CDN videos (CC0 / royalty-free)
-const FASHION_REELS = [
-  { src: 'https://videos.pexels.com/video-files/7214090/7214090-sd_360_640_25fps.mp4', label: 'Block Print Walk' },
-  { src: 'https://videos.pexels.com/video-files/8285503/8285503-sd_360_640_25fps.mp4', label: 'Silk Trench' },
-  { src: 'https://videos.pexels.com/video-files/6389087/6389087-sd_360_640_25fps.mp4', label: 'Summer Collection' },
-  { src: 'https://videos.pexels.com/video-files/6231808/6231808-sd_360_640_25fps.mp4', label: 'Tiered Skirt' },
-  { src: 'https://videos.pexels.com/video-files/5386771/5386771-sd_360_640_25fps.mp4', label: 'Studio Prep' },
-  { src: 'https://videos.pexels.com/video-files/4754961/4754961-sd_360_640_25fps.mp4', label: 'Heritage Craft' },
-];
-
-const TEAM_REELS = [
-  { src: 'https://videos.pexels.com/video-files/4098942/4098942-sd_360_640_25fps.mp4', label: 'Artisan Dyeing' },
-  { src: 'https://videos.pexels.com/video-files/4098940/4098940-sd_360_640_25fps.mp4', label: 'Block Printing' },
-  { src: 'https://videos.pexels.com/video-files/3687757/3687757-sd_360_640_25fps.mp4', label: 'Loom Weaving' },
-  { src: 'https://videos.pexels.com/video-files/4098943/4098943-sd_360_640_25fps.mp4', label: 'Finishing Touches' },
-  { src: 'https://videos.pexels.com/video-files/4098941/4098941-sd_360_640_25fps.mp4', label: 'Quality Check' },
-  { src: 'https://videos.pexels.com/video-files/4098942/4098942-sd_360_640_25fps.mp4', label: 'Packing & Care' },
-];
-
 export default function Home({ navigateTo, setCategoryFilter, addToCart, PRODUCTS, CATEGORIES, viewProductDetails }) {
+  const [heroSlides, setHeroSlides] = useState([]);
+  const [testimonials, setTestimonials] = useState(TESTIMONIALS);
+  const [fashionReels, setFashionReels] = useState([]);
+  const [teamReels, setTeamReels] = useState([]);
+  const [brandOverlay, setBrandOverlay] = useState(HERO_SLIDES[0].img);
   const [heroIdx, setHeroIdx] = useState(0);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [heroData, testData, fashionData, teamData, overlayData] = await Promise.all([
+          getSetting('hero_slides').catch(() => null),
+          getTestimonials().catch(() => null),
+          getSetting('fashion_reels').catch(() => null),
+          getSetting('team_reels').catch(() => null),
+          getSetting('brand_overlay_image').catch(() => null)
+        ]);
+        if (heroData) {
+          let parsed = typeof heroData === 'string' ? JSON.parse(heroData) : heroData;
+          if (typeof parsed === 'string') parsed = JSON.parse(parsed);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setHeroSlides(parsed);
+          } else {
+            setHeroSlides(HERO_SLIDES);
+          }
+        } else {
+          setHeroSlides(HERO_SLIDES);
+        }
+        if (testData && testData.length > 0) setTestimonials(testData);
+        if (fashionData) {
+          let parsed = typeof fashionData === 'string' ? JSON.parse(fashionData) : fashionData;
+          if (typeof parsed === 'string') parsed = JSON.parse(parsed);
+          if (Array.isArray(parsed) && parsed.length > 0) setFashionReels(parsed);
+        }
+        if (teamData) {
+          let parsed = typeof teamData === 'string' ? JSON.parse(teamData) : teamData;
+          if (typeof parsed === 'string') parsed = JSON.parse(parsed);
+          if (Array.isArray(parsed) && parsed.length > 0) setTeamReels(parsed);
+        }
+        if (overlayData) setBrandOverlay(overlayData);
+      } catch (err) {
+        console.error('Error fetching home data:', err);
+      }
+    };
+    fetchData();
+  }, []);
+  const heroRef = useRef(null);
   const heroTimer = useRef(null);
+  const isUserScrolling = useRef(false);
   const catRef = useRef(null);
 
-  // Auto-slide hero
+  // Auto-advance hero via scroll
   useEffect(() => {
-    heroTimer.current = setInterval(() => {
-      setHeroIdx(i => (i + 1) % HERO_SLIDES.length);
-    }, 4500);
+    const startAutoPlay = () => {
+      heroTimer.current = setInterval(() => {
+        if (isUserScrolling.current) return;
+        const el = heroRef.current;
+        if (!el) return;
+        const slideWidth = el.clientWidth;
+        const nextIdx = (heroIdx + 1) % heroSlides.length;
+        el.scrollTo({ left: nextIdx * slideWidth, behavior: 'smooth' });
+      }, 4500);
+    };
+    startAutoPlay();
     return () => clearInterval(heroTimer.current);
-  }, []);
+  }, [heroIdx, heroSlides]);
+
+  // Sync dot index from scroll position
+  const handleHeroScroll = (e) => {
+    const el = e.target;
+    const slideWidth = el.clientWidth;
+    if (slideWidth > 0) {
+      const idx = Math.round(el.scrollLeft / slideWidth);
+      if (idx !== heroIdx) setHeroIdx(idx);
+    }
+  };
+
+  // When user taps a dot — scroll to that slide
+  const scrollToSlide = (i) => {
+    clearInterval(heroTimer.current);
+    const el = heroRef.current;
+    if (el) el.scrollTo({ left: i * el.clientWidth, behavior: 'smooth' });
+    setHeroIdx(i);
+  };
 
   // Auto-scroll categories smoothly every 2.5 seconds
   useEffect(() => {
@@ -103,47 +156,59 @@ export default function Home({ navigateTo, setCategoryFilter, addToCart, PRODUCT
     return () => {
       hiddenElements.forEach((el) => observer.unobserve(el));
     };
-  }, []);
+  }, [fashionReels, teamReels, testimonials]);
 
   return (
     <div>
-      {/* ── Hero Carousel (no prev/next buttons, reduced height) ── */}
-      <section className="relative w-full h-[42vh] md:h-[58vh] overflow-hidden bg-surface-container">
-        {HERO_SLIDES.map((slide, i) => (
-          <div
-            key={i}
-            className="absolute inset-0 transition-opacity duration-1000"
-            style={{ opacity: i === heroIdx ? 1 : 0, zIndex: i === heroIdx ? 1 : 0 }}
-          >
-            <img
-              alt={slide.headline}
-              className="w-full h-full object-cover object-center"
-              src={slide.img}
-            />
-            <div className="absolute inset-0 bg-black/30" />
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
-              <span className="font-label-caps text-[11px] text-dusty-gold tracking-[0.3em] uppercase mb-3 block opacity-90">
-                {slide.sub}
-              </span>
-              <h1 className="font-display-lg text-[32px] md:text-[64px] text-white mb-6 leading-none tracking-tight">
-                {slide.headline}
-              </h1>
-              <button
-                onClick={() => navigateTo('shop')}
-                className="bg-white/90 backdrop-blur-sm text-primary font-label-caps text-label-caps px-8 py-3 uppercase tracking-widest hover:bg-primary hover:text-white transition-all duration-300 border-none text-[11px]"
-              >
-                Explore Collection
-              </button>
+      {/* ── Hero Carousel — horizontal scroll-snap, touch-swipeable ── */}
+      <section className="relative w-full h-[42vh] md:h-[58vh] bg-surface-container overflow-hidden">
+        {/* Scrollable track */}
+        <div
+          ref={heroRef}
+          onScroll={handleHeroScroll}
+          className="flex w-full h-full overflow-x-auto snap-x snap-mandatory no-scrollbar"
+          style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-x' }}
+        >
+          {heroSlides.length === 0 ? (
+            <div className="w-full h-full flex items-center justify-center">
+              <span className="material-symbols-outlined animate-spin text-secondary">sync</span>
             </div>
-          </div>
-        ))}
+          ) : heroSlides.map((slide, i) => (
+            <div
+              key={i}
+              className="relative w-full h-full flex-shrink-0 snap-center snap-always"
+            >
+              <img
+                alt={slide.headline}
+                className="w-full h-full object-cover object-center"
+                src={slide.img}
+                draggable={false}
+              />
+              <div className="absolute inset-0 bg-black/30" />
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6 pointer-events-none">
+                <span className="font-label-caps text-[11px] text-dusty-gold tracking-[0.3em] uppercase mb-3 block opacity-90">
+                  {slide.sub}
+                </span>
+                <h1 className="font-display-lg text-[32px] md:text-[64px] text-white mb-6 leading-none tracking-tight">
+                  {slide.headline}
+                </h1>
+                <button
+                  onClick={() => navigateTo('shop')}
+                  className="bg-white/90 backdrop-blur-sm text-primary font-label-caps text-label-caps px-8 py-3 uppercase tracking-widest hover:bg-primary hover:text-white transition-all duration-300 border-none text-[11px] pointer-events-auto cursor-pointer"
+                >
+                  Explore Collection
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
 
-        {/* Dot indicators only — no prev/next arrows */}
+        {/* Dot indicators */}
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
-          {HERO_SLIDES.map((_, i) => (
+          {heroSlides.map((_, i) => (
             <button
               key={i}
-              onClick={() => { setHeroIdx(i); clearInterval(heroTimer.current); }}
+              onClick={() => scrollToSlide(i)}
               className={`h-1.5 rounded-full transition-all duration-300 border-none cursor-pointer ${i === heroIdx ? 'w-6 bg-white' : 'w-1.5 bg-white/50'}`}
             />
           ))}
@@ -223,7 +288,16 @@ export default function Home({ navigateTo, setCategoryFilter, addToCart, PRODUCT
                     </div>
                   )}
                   <button
-                    onClick={(e) => { e.stopPropagation(); addToCart(prod, prod.sizes?.[0] || 'S', prod.colors?.[0] || ''); }}
+                    onClick={(e) => { 
+                      e.stopPropagation(); 
+                      let sz = prod.sizes?.[0] || 'S';
+                      let col = prod.colors?.[0] || '';
+                      if (prod.inventory?.length > 0) {
+                        const avail = prod.inventory.find(inv => inv.stock_qty > 0);
+                        if (avail) { sz = avail.size || sz; col = avail.color || col; }
+                      }
+                      addToCart(prod, sz, col); 
+                    }}
                     className="absolute bottom-2 right-2 z-20 w-8 h-8 bg-primary text-white flex items-center justify-center hover:bg-muted-terracotta transition-colors duration-200 shadow-md border-none"
                     title="Quick Add"
                   >
@@ -266,65 +340,64 @@ export default function Home({ navigateTo, setCategoryFilter, addToCart, PRODUCT
       </section>
 
       {/* ── Fashion Reels Section — auto-playing looping vertical video tiles ── */}
-      <section className="py-10 md:py-14 bg-warm-ivory reveal-on-scroll">
-        <div className="px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto mb-6">
-          <span className="font-label-caps text-[10px] text-muted-terracotta tracking-[0.25em] uppercase mb-2 block">Style in Motion</span>
-          <h2 className="font-headline-xl text-[24px] md:text-[38px] text-primary">Fashion Reels</h2>
-        </div>
+      {fashionReels.length > 0 && (
+        <section className="py-10 md:py-14 bg-warm-ivory reveal-on-scroll">
+          <div className="px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto mb-6">
+            <span className="font-label-caps text-[10px] text-muted-terracotta tracking-[0.25em] uppercase mb-2 block">Style in Motion</span>
+            <h2 className="font-headline-xl text-[24px] md:text-[38px] text-primary">Fashion Reels</h2>
+          </div>
 
-        <div
-          className="flex gap-3 md:gap-4 overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory px-margin-mobile md:px-margin-desktop pb-2"
-          style={{ WebkitOverflowScrolling: 'touch' }}
-        >
-          {FASHION_REELS.map((reel, i) => (
-            <div
-              key={i}
-              className="relative flex-shrink-0 snap-start overflow-hidden group"
-              style={{ width: '150px', minWidth: '138px' }}
-            >
-              <div className="relative rounded-lg overflow-hidden" style={{ aspectRatio: '9/16' }}>
-                <video
-                  src={reel.src}
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  className="w-full h-full object-cover object-center"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/5 to-transparent" />
-                <div className="absolute bottom-3 left-2.5 right-2.5">
-                  <p className="font-label-caps text-[9px] text-white tracking-wider uppercase leading-tight">{reel.label}</p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ── Team Working Reels — continuously scrolling marquee ── */}
-      <section className="py-10 md:py-12 bg-primary overflow-hidden reveal-on-scroll">
-        <div className="px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto mb-6">
-          <span className="font-label-caps text-[10px] text-dusty-gold tracking-[0.25em] uppercase mb-2 block">Behind the Craft</span>
-          <h2 className="font-headline-xl text-[24px] md:text-[38px] text-white">Team Working Reels</h2>
-        </div>
-
-        {/* Infinite-scroll marquee — duplicated for seamless loop */}
-        <div className="flex overflow-hidden" aria-hidden="true">
           <div
-            className="flex gap-3 flex-shrink-0"
-            style={{
-              animation: 'marqueeScroll 28s linear infinite',
-            }}
+            className="flex gap-3 md:gap-4 overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory px-margin-mobile md:px-margin-desktop pb-2"
+            style={{ WebkitOverflowScrolling: 'touch' }}
           >
-            {[...TEAM_REELS, ...TEAM_REELS].map((reel, i) => (
+            {fashionReels.map((reel, i) => (
               <div
                 key={i}
-                className="relative flex-shrink-0 overflow-hidden rounded-lg"
-                style={{ width: '130px', minWidth: '130px' }}
+                className="relative flex-shrink-0 snap-start overflow-hidden group"
+                style={{ width: '150px', minWidth: '138px' }}
+              >
+                <div className="relative rounded-lg overflow-hidden" style={{ aspectRatio: '9/16' }}>
+                  <video
+                    src={reel.src || reel.url}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="w-full h-full object-cover object-center"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/5 to-transparent" />
+                  <div className="absolute bottom-3 left-2.5 right-2.5">
+                    <p className="font-label-caps text-[9px] text-white tracking-wider uppercase leading-tight">{reel.label || reel.title}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ── Team Working Reels — continuously scrolling marquee ── */}
+      {teamReels.length > 0 && (
+        <section className="py-10 md:py-12 bg-primary overflow-hidden reveal-on-scroll">
+          <div className="px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto mb-6">
+            <span className="font-label-caps text-[10px] text-dusty-gold tracking-[0.25em] uppercase mb-2 block">Behind the Craft</span>
+            <h2 className="font-headline-xl text-[24px] md:text-[38px] text-white">Team Working Reels</h2>
+          </div>
+
+          <div
+            className="flex gap-3 md:gap-4 overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory px-margin-mobile md:px-margin-desktop pb-2"
+            style={{ WebkitOverflowScrolling: 'touch' }}
+          >
+            {teamReels.map((reel, i) => (
+              <div
+                key={i}
+                className="relative flex-shrink-0 overflow-hidden rounded-lg snap-start"
+                style={{ width: '150px', minWidth: '138px' }}
               >
                 <div className="relative" style={{ aspectRatio: '9/16' }}>
                   <video
-                    src={reel.src}
+                    src={reel.src || reel.url}
                     autoPlay
                     loop
                     muted
@@ -333,14 +406,14 @@ export default function Home({ navigateTo, setCategoryFilter, addToCart, PRODUCT
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
                   <div className="absolute bottom-3 left-2.5 right-2.5">
-                    <p className="font-label-caps text-[8px] text-white/90 tracking-wider uppercase leading-tight">{reel.label}</p>
+                    <p className="font-label-caps text-[8px] text-white/90 tracking-wider uppercase leading-tight">{reel.label || reel.title}</p>
                   </div>
                 </div>
               </div>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ── Voice of Rangova (scrollable, no buttons) ── */}
       <section className="py-10 md:py-14 bg-white overflow-hidden reveal-on-scroll">
@@ -354,24 +427,27 @@ export default function Home({ navigateTo, setCategoryFilter, addToCart, PRODUCT
           className="flex gap-4 md:gap-5 overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory px-margin-mobile md:px-margin-desktop pb-4"
           style={{ WebkitOverflowScrolling: 'touch' }}
         >
-          {TESTIMONIALS.map((t, i) => (
+          {testimonials.map((t, i) => (
             <div key={i} className="flex-shrink-0 snap-start" style={{ width: 'min(88vw, 460px)' }}>
-              <div className="bg-warm-ivory border border-outline-variant/20 flex flex-col sm:flex-row gap-0 overflow-hidden h-full">
-                <div className="w-full sm:w-36 md:w-44 flex-shrink-0">
-                  <img
-                    src={t.face}
-                    alt={t.name}
-                    className="w-full h-40 sm:h-full object-cover object-center"
-                    style={{ minHeight: '160px', maxHeight: '220px' }}
-                  />
-                </div>
-                <div className="flex flex-col justify-center p-5 md:p-6 flex-1">
-                  <span className="text-muted-terracotta text-3xl leading-none font-headline-sm block mb-2">"</span>
-                  <p className="font-body-lg text-[13px] md:text-[15px] text-primary italic mb-4 leading-relaxed">{t.quote}</p>
-                  <div>
-                    <span className="font-label-caps text-[11px] text-primary uppercase tracking-widest block font-bold">— {t.name}</span>
-                    <span className="font-label-caps text-[10px] text-secondary uppercase tracking-widest">{t.role}</span>
+              <div className="bg-warm-ivory border border-outline-variant/20 rounded-[15px] flex flex-col gap-4 p-4 overflow-hidden h-full">
+                {/* Image row - horizontal on all screens */}
+                <div className="flex items-center gap-3">
+                  <div className="flex-shrink-0">
+                    <img
+                      src={t.image_url || t.face}
+                      alt={t.customer_name || t.name}
+                      className="w-14 h-14 object-cover rounded-full border border-outline-variant/30"
+                    />
                   </div>
+                  <div>
+                    <span className="font-label-caps text-[11px] text-primary uppercase tracking-widest block font-bold">{t.customer_name || t.name}</span>
+                    <span className="font-label-caps text-[10px] text-secondary uppercase tracking-widest">{t.customer_position || t.role}</span>
+                  </div>
+                </div>
+                {/* Quote */}
+                <div className="flex-1">
+                  <span className="text-muted-terracotta text-2xl leading-none font-headline-sm block mb-1">"</span>
+                  <p className="font-body-lg text-[13px] text-primary italic leading-relaxed">{t.review || t.quote}</p>
                 </div>
               </div>
             </div>
@@ -380,8 +456,8 @@ export default function Home({ navigateTo, setCategoryFilter, addToCart, PRODUCT
       </section>
 
       {/* ── Brand Spread ── */}
-      <section className="w-full h-[28vh] md:h-[38vh] relative reveal-on-scroll">
-        <img alt="Brand overlay" className="w-full h-full object-cover object-center" src={HERO_SLIDES[0].img} />
+      <section className="w-full relative reveal-on-scroll flex">
+        <img alt="Brand overlay" className="w-full h-auto object-contain" src={brandOverlay} />
         <div className="absolute inset-0 bg-black/15" />
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <span className="font-display-lg text-[10vw] text-white/20 tracking-tighter mix-blend-overlay">RANGOVA</span>

@@ -1,26 +1,54 @@
 import React, { useState, useEffect, useRef } from 'react';
+import ReactMarkdown from 'react-markdown';
 // Using products passed as prop
 
 export default function ProductDetails({ navigateTo, addToCart, selectedProductId, viewProductDetails, products = [] }) {
   // Find active product
   const prod = products.find(p => p.id === selectedProductId) || products[0] || {};
 
-  // Default color setup
-  const initialColor = prod.colors?.[0] || 'Warm Ivory';
+  // Default variant setup
+  let initialColor = prod.colors?.[0] || 'Warm Ivory';
+  let initialSize = prod.sizes?.[0] || 'S';
+  if (prod.inventory?.length > 0) {
+    const avail = prod.inventory.find(i => i.stock_qty > 0);
+    if (avail) {
+      initialColor = avail.color || initialColor;
+      initialSize = avail.size || initialSize;
+    }
+  }
+
   const [selectedColor, setSelectedColor] = useState(initialColor);
-  const [selectedSize, setSelectedSize] = useState(prod.sizes?.[0] || 'S');
+  const [selectedSize, setSelectedSize] = useState(initialSize);
   const [activeImageIdx, setActiveImageIdx] = useState(0);
   const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
   const [openAccordions, setOpenAccordions] = useState({ details: true, shipping: false });
+
+  const currentInStock = (() => {
+    if (!prod || !prod.inventory || prod.inventory.length === 0) return prod?.inStock ?? false;
+    const invItem = prod.inventory.find(i => 
+      (i.color || '').toLowerCase() === (selectedColor || '').toLowerCase() &&
+      (i.size || '').toLowerCase() === (selectedSize || '').toLowerCase()
+    );
+    return invItem ? invItem.stock_qty > 0 : false;
+  })();
 
   const carouselRef = useRef(null);
 
   // Sync color changes when product ID changes
   useEffect(() => {
-    const defaultCol = prod.colors?.[0] || 'Warm Ivory';
+    let defaultCol = prod.colors?.[0] || 'Warm Ivory';
+    let defaultSize = prod.sizes?.[0] || 'S';
+    if (prod.inventory?.length > 0) {
+      const avail = prod.inventory.find(i => i.stock_qty > 0);
+      if (avail) {
+        defaultCol = avail.color || defaultCol;
+        defaultSize = avail.size || defaultSize;
+      }
+    }
     setSelectedColor(defaultCol);
-    setSelectedSize(prod.sizes?.[0] || 'S');
+    setSelectedSize(defaultSize);
     setActiveImageIdx(0);
+    setOpenAccordions({ details: true, shipping: false });
     if (carouselRef.current) {
       carouselRef.current.scrollLeft = 0;
     }
@@ -37,7 +65,9 @@ export default function ProductDetails({ navigateTo, addToCart, selectedProductI
   }, [selectedColor]);
 
   // Extract color specific images
-  const colorImages = prod.imagesByColor?.[selectedColor] || [prod.imageMain, prod.imageHover, prod.imageMain];
+  const colorImages = (prod.imagesByColor && prod.imagesByColor[selectedColor] && prod.imagesByColor[selectedColor].length > 0)
+    ? prod.imagesByColor[selectedColor]
+    : [prod.imageMain, prod.imageHover].filter(Boolean);
 
   const handleThumbnailClick = (idx) => {
     setActiveImageIdx(idx);
@@ -202,8 +232,11 @@ export default function ProductDetails({ navigateTo, addToCart, selectedProductI
               {prod.badge && (
                 <span className="bg-soft-beige px-3 py-1 font-label-caps text-[9px] text-primary uppercase tracking-widest mb-3 inline-block font-bold">{prod.badge}</span>
               )}
+              {!currentInStock && (
+                <span className="bg-white/90 border border-outline-variant/30 text-primary px-3 py-1 font-label-caps text-[9px] uppercase tracking-widest mb-3 inline-block font-bold ml-2">Out of Stock</span>
+              )}
               {/* Clean elegant serif product title - sized smaller for premium style */}
-              <h1 className="font-display-lg text-[22px] md:text-[30px] text-primary mb-2.5 leading-snug tracking-tight font-bold uppercase">{prod.title}</h1>
+              <h1 className={`font-display-lg text-[22px] md:text-[30px] text-primary mb-2.5 leading-snug tracking-tight font-bold uppercase ${!currentInStock ? 'opacity-60' : ''}`}>{prod.title}</h1>
               
               {/* Premium pricing display with market crossed-out original price */}
               <div className="flex items-baseline gap-3 mt-2">
@@ -215,7 +248,9 @@ export default function ProductDetails({ navigateTo, addToCart, selectedProductI
 
             {prod.description && (
               <div className="mb-6 border-b border-outline-variant/20 pb-6">
-                <p className="font-body-md text-sm text-on-surface-variant leading-relaxed">{prod.description}</p>
+                <div className="font-body-md text-sm text-on-surface-variant leading-relaxed">
+                  <ReactMarkdown>{prod.description}</ReactMarkdown>
+                </div>
               </div>
             )}
 
@@ -270,25 +305,34 @@ export default function ProductDetails({ navigateTo, addToCart, selectedProductI
 
             {/* Add to Bag */}
             <button
+              disabled={!currentInStock}
               onClick={() => addToCart(prod, selectedSize, selectedColor)}
-              className="w-full bg-primary text-on-primary py-4 font-label-caps text-label-caps tracking-widest hover:bg-muted-terracotta transition-all duration-300 mb-8 shadow-md border-none cursor-pointer text-xs font-bold"
+              className={`w-full py-4 font-label-caps text-label-caps tracking-widest transition-all duration-300 mb-8 shadow-md border-none text-xs font-bold ${!currentInStock ? 'bg-surface-variant text-secondary cursor-not-allowed opacity-70' : 'bg-primary text-on-primary hover:bg-muted-terracotta cursor-pointer'}`}
             >
-              ADD TO BAG
+              {!currentInStock ? 'OUT OF STOCK' : 'ADD TO BAG'}
             </button>
 
             {/* Accordions */}
             <div className="border-t border-outline-variant/20 mb-8">
               {[
                 { key: 'details', label: 'Details & Care', content: (
-                  <ul className="list-disc pl-5 space-y-1.5 font-body-md text-xs text-on-surface-variant leading-relaxed">
-                    <li>100% Ahimsa Silk (Cruelty-Free, Handspun)</li>
-                    <li>Hand-loomed by heritage master artisans in Jaipur, India</li>
-                    <li>Printed using natural block prints and minerals</li>
-                    <li>Dry clean only using mild organic detergents</li>
-                  </ul>
+                  <div className="font-body-md text-xs text-on-surface-variant leading-relaxed">
+                    {prod.details_care ? <ReactMarkdown>{prod.details_care}</ReactMarkdown> : (
+                      <ul className="list-disc pl-5 space-y-1.5">
+                        <li>100% Ahimsa Silk (Cruelty-Free, Handspun)</li>
+                        <li>Hand-loomed by heritage master artisans in Jaipur, India</li>
+                        <li>Printed using natural block prints and minerals</li>
+                        <li>Dry clean only using mild organic detergents</li>
+                      </ul>
+                    )}
+                  </div>
                 )},
                 { key: 'shipping', label: 'Shipping & Returns', content: (
-                  <p className="font-body-md text-xs text-on-surface-variant leading-relaxed">Complimentary express shipping on orders over ₹25,000. Delivery typically takes 3-5 business days. We accept returns within 14 days of delivery.</p>
+                  <div className="font-body-md text-xs text-on-surface-variant leading-relaxed">
+                    {prod.shipping_info ? <ReactMarkdown>{prod.shipping_info}</ReactMarkdown> : (
+                      <p>Complimentary express shipping on orders over ₹25,000. Delivery typically takes 3-5 business days. We accept returns within 14 days of delivery.</p>
+                    )}
+                  </div>
                 )}
               ].map(({ key, label, content }) => (
                 <div key={key} className="border-b border-outline-variant/20">
@@ -329,7 +373,7 @@ export default function ProductDetails({ navigateTo, addToCart, selectedProductI
               }}
               className="w-[180px] md:w-[260px] min-w-[180px] md:min-w-[260px] snap-start cursor-pointer group text-left"
             >
-              <div className="relative aspect-[3/4] overflow-hidden bg-surface-container-low mb-3">
+              <div className={`relative aspect-[3/4] overflow-hidden bg-surface-container-low mb-3 ${item.inStock === false ? 'opacity-55' : ''}`}>
                 <img 
                   alt={item.title} 
                   src={item.imageMain} 
@@ -337,6 +381,13 @@ export default function ProductDetails({ navigateTo, addToCart, selectedProductI
                 />
                 {item.badge && (
                   <span className="absolute top-2 left-2 bg-soft-beige px-2 py-0.5 font-label-caps text-[8px] text-primary uppercase tracking-widest font-bold">{item.badge}</span>
+                )}
+                {item.inStock === false && (
+                  <div className="absolute inset-0 flex items-center justify-center z-20">
+                    <span className="bg-white/90 text-primary font-label-caps text-[9px] uppercase tracking-widest px-4 py-1.5 border border-outline-variant/30">
+                      Out of Stock
+                    </span>
+                  </div>
                 )}
               </div>
               <h3 className="font-body-md text-[13px] md:text-sm text-primary mb-1 group-hover:text-muted-terracotta transition-colors truncate font-semibold leading-snug">{item.title}</h3>

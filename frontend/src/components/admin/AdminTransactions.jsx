@@ -6,6 +6,7 @@ export default function AdminTransactions({ orders = [], triggerNotification, on
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedItem, setSelectedItem] = useState(null);
   const [localLoading, setLocalLoading] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(20);
 
   const fetchTransactionsData = async () => {
     try {
@@ -50,8 +51,25 @@ export default function AdminTransactions({ orders = [], triggerNotification, on
     });
   }, [transactionsList, searchQuery, orders]);
 
+  React.useEffect(() => {
+    setVisibleCount(20);
+  }, [searchQuery, orders]);
+
+  const displayedTransactions = useMemo(() => filteredTransactions.slice(0, visibleCount), [filteredTransactions, visibleCount]);
+
+  const loadMoreRef = React.useRef(null);
+  React.useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && visibleCount < filteredTransactions.length) {
+        setVisibleCount(prev => prev + 20);
+      }
+    });
+    if (loadMoreRef.current) observer.observe(loadMoreRef.current);
+    return () => observer.disconnect();
+  }, [visibleCount, filteredTransactions.length]);
+
   return (
-    <div className="flex-1 flex flex-col md:flex-row gap-6 overflow-hidden">
+    <div className="flex-1 flex flex-col md:flex-row gap-6 h-full overflow-hidden">
       {/* Left panel - Transactions List */}
       <div className="flex-grow flex flex-col min-w-0 bg-white border border-outline-variant/30 rounded-lg shadow-sm">
         {/* Toolbar */}
@@ -98,7 +116,7 @@ export default function AdminTransactions({ orders = [], triggerNotification, on
                 </tr>
               </thead>
               <tbody className="divide-y divide-outline-variant/10 text-sm">
-                {filteredTransactions.map(item => {
+                {displayedTransactions.map(item => {
                   const isSelected = selectedItem?.id === item.id;
                   const order = getOrderInfo(item.order_id);
                   return (
@@ -120,6 +138,11 @@ export default function AdminTransactions({ orders = [], triggerNotification, on
                     </tr>
                   );
                 })}
+                {visibleCount < filteredTransactions.length && (
+                  <tr ref={loadMoreRef}>
+                    <td colSpan="6" className="py-4 text-center text-secondary">Loading more...</td>
+                  </tr>
+                )}
               </tbody>
             </table>
           )}

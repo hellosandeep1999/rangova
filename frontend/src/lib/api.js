@@ -61,8 +61,9 @@ export function isAdminLoggedIn() {
 }
 
 // ── PRODUCTS ─────────────────────────────────────────
-export async function getProducts() {
-  const res = await fetch(`${BASE}/products`);
+export async function getProducts(admin = false) {
+  const url = admin ? `${BASE}/products?admin=true` : `${BASE}/products`;
+  const res = await fetch(url);
   return res.json();
 }
 
@@ -135,6 +136,17 @@ export async function getCustomerOrders(id) {
   return handleResponse(res);
 }
 
+export async function updateCustomerStatus(id, status) {
+  const res = await fetch(`${BASE}/customers/${id}/status`, { method: 'PATCH', headers: authHeaders(), body: JSON.stringify({ status }) });
+  return handleResponse(res);
+}
+
+export async function getOrdersByEmail(email) {
+  const res = await fetch(`${BASE}/customers/orders-by-email/${encodeURIComponent(email)}`);
+  if (!res.ok) return [];
+  return res.json();
+}
+
 // ── INVENTORY ─────────────────────────────────────────
 export async function getInventory() {
   const res = await fetch(`${BASE}/inventory`, { headers: authHeaders() });
@@ -190,6 +202,24 @@ export async function getTransactions() {
 }
 
 // ── SETTINGS ──────────────────────────────────────────
+export async function getAllSettings() {
+  const res = await fetch(`${BASE}/settings`);
+  if (!res.ok) return {};
+  return res.json();
+}
+
+export async function getShippingSettings() {
+  try {
+    const settings = await getAllSettings();
+    return {
+      threshold: parseFloat(settings.free_shipping_threshold) || 999,
+      charge: parseFloat(settings.shipping_charge) || 50
+    };
+  } catch {
+    return { threshold: 999, charge: 50 };
+  }
+}
+
 export async function getSetting(key) {
   const res = await fetch(`${BASE}/settings/${key}`);
   if (!res.ok) return null;
@@ -204,5 +234,27 @@ export async function updateSetting(key, value) {
 // ── ACTIVITY LOGS ─────────────────────────────────────
 export async function getActivityLogs() {
   const res = await fetch(`${BASE}/activity`, { headers: authHeaders() });
+  return handleResponse(res);
+}
+
+// ── TESTIMONIALS ──────────────────────────────────────
+export async function getTestimonials() {
+  const res = await fetch(`${BASE}/testimonials`);
+  if (!res.ok) return [];
+  return res.json();
+}
+
+export async function createTestimonial(data) {
+  const res = await fetch(`${BASE}/testimonials`, { method: 'POST', headers: authHeaders(), body: JSON.stringify(data) });
+  return handleResponse(res);
+}
+
+export async function updateTestimonial(id, data) {
+  const res = await fetch(`${BASE}/testimonials/${id}`, { method: 'PUT', headers: authHeaders(), body: JSON.stringify(data) });
+  return handleResponse(res);
+}
+
+export async function deleteTestimonial(id) {
+  const res = await fetch(`${BASE}/testimonials/${id}`, { method: 'DELETE', headers: authHeaders() });
   return handleResponse(res);
 }

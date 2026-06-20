@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { createCategory, updateCategory, deleteCategory, uploadFileToSupabase } from '../../lib/api';
+import ConfirmModal from '../ConfirmModal';
 
 export default function AdminCategories({ categories, setCategories, triggerNotification, onRefresh, loading }) {
   const [showCategoryModal, setShowCategoryModal] = useState(false);
@@ -8,6 +9,7 @@ export default function AdminCategories({ categories, setCategories, triggerNoti
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
   
   // DB columns: id (uuid), title, idx, image_url, slug, created_at
   const [categoryForm, setCategoryForm] = useState({ title: '', slug: '', idx: '', image_url: '' });
@@ -93,16 +95,17 @@ export default function AdminCategories({ categories, setCategories, triggerNoti
     }
   };
 
-  const handleDeleteCategory = async (id) => {
-    if (window.confirm('Are you sure you want to delete this category?')) {
-      try {
-        await deleteCategory(id);
-        setCategories(categories.filter(c => c.id !== id));
-        if (selectedCategory?.id === id) setSelectedCategory(null);
-        triggerNotification('Category deleted successfully');
-      } catch (err) {
-        triggerNotification('Error deleting category');
-      }
+  const handleDeleteCategory = async () => {
+    if (!confirmDeleteId) return;
+    try {
+      await deleteCategory(confirmDeleteId);
+      setCategories(categories.filter(c => c.id !== confirmDeleteId));
+      if (selectedCategory?.id === confirmDeleteId) setSelectedCategory(null);
+      triggerNotification('Category deleted successfully');
+    } catch (err) {
+      triggerNotification('Error deleting category');
+    } finally {
+      setConfirmDeleteId(null);
     }
   };
 
@@ -111,7 +114,7 @@ export default function AdminCategories({ categories, setCategories, triggerNoti
   });
 
   return (
-    <div className="flex gap-4 h-full">
+    <div className="flex gap-4 h-full overflow-hidden">
       {/* Main List */}
       <div className={`flex flex-col transition-all duration-300 ${selectedCategory ? 'flex-1 min-w-0' : 'w-full'}`}>
         <div className="flex justify-between items-center mb-6">
@@ -135,8 +138,8 @@ export default function AdminCategories({ categories, setCategories, triggerNoti
           </button>
         </div>
 
-        <div className="bg-white border border-outline-variant/30 rounded-sm shadow-sm overflow-hidden">
-          <div className="overflow-x-auto">
+        <div className="bg-white border border-outline-variant/30 rounded-sm shadow-sm overflow-hidden flex-1 flex flex-col">
+          <div className="overflow-auto flex-1">
             <table className="w-full text-left">
               <thead className="bg-surface-variant/30 border-b border-outline-variant/30 font-label-caps text-[10px] text-secondary tracking-widest uppercase">
                 <tr>
@@ -174,7 +177,7 @@ export default function AdminCategories({ categories, setCategories, triggerNoti
                         className="text-[10px] font-label-caps uppercase text-primary hover:text-muted-terracotta transition-colors bg-transparent border-none cursor-pointer mr-3"
                       >Edit</button>
                       <button
-                        onClick={() => handleDeleteCategory(cat.id)}
+                        onClick={() => setConfirmDeleteId(cat.id)}
                         className="text-[10px] font-label-caps uppercase text-muted-terracotta hover:text-red-700 transition-colors bg-transparent border-none cursor-pointer"
                       >Delete</button>
                     </td>
@@ -241,7 +244,7 @@ export default function AdminCategories({ categories, setCategories, triggerNoti
                 className="flex-1 py-2 font-label-caps text-[10px] uppercase tracking-widest border-none cursor-pointer hover:opacity-80 transition-opacity"
               >Edit</button>
               <button
-                onClick={() => handleDeleteCategory(selectedCategory.id)}
+                onClick={() => setConfirmDeleteId(selectedCategory.id)}
                 className="flex-1 py-2 font-label-caps text-[10px] uppercase tracking-widest border border-red-300 text-red-600 bg-transparent cursor-pointer hover:bg-red-50 transition-colors"
               >Delete</button>
             </div>
@@ -351,6 +354,15 @@ export default function AdminCategories({ categories, setCategories, triggerNoti
           </div>
         </div>
       )}
+      {/* Confirm Delete Modal */}
+      <ConfirmModal
+        isOpen={!!confirmDeleteId}
+        title="Delete Category"
+        message="Are you sure you want to delete this category? This action cannot be undone."
+        confirmLabel="Delete Category"
+        onConfirm={handleDeleteCategory}
+        onCancel={() => setConfirmDeleteId(null)}
+      />
     </div>
   );
 }

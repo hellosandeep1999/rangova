@@ -23,9 +23,21 @@ export default function Header({
 
   return (
     <>
-      {discount && discount.active && (
-        <div className="bg-primary text-white text-[10px] font-label-caps uppercase tracking-widest text-center py-2 px-4 w-full relative z-[60]">
-          {discount.text}
+      {discount && Array.isArray(discount) && discount.length > 0 && (
+        <div className="bg-primary text-white text-[10px] font-label-caps uppercase tracking-widest py-2 w-full relative z-[60] overflow-hidden">
+          <div className="whitespace-nowrap animate-marquee flex items-center gap-12 pl-full">
+            {discount.map((d, idx) => (
+              <span key={d.id || idx} className="inline-block">
+                USE CODE <span className="font-bold text-muted-terracotta">{d.code}</span> FOR {d.percent}% OFF
+              </span>
+            ))}
+            {/* Duplicate for seamless infinite scrolling */}
+            {discount.map((d, idx) => (
+              <span key={`dup-${d.id || idx}`} className="inline-block">
+                USE CODE <span className="font-bold text-muted-terracotta">{d.code}</span> FOR {d.percent}% OFF
+              </span>
+            ))}
+          </div>
         </div>
       )}
       <header className={`sticky top-0 z-50 bg-surface transition-all duration-300 w-full border-b border-surface-variant/30 ${isHeaderShrunk ? 'py-3 shadow-md' : 'py-5 shadow-sm'}`}>
@@ -56,7 +68,7 @@ export default function Header({
         {/* Brand Logo */}
         <button 
           onClick={() => navigateTo('home')} 
-          className="font-display-lg text-[22px] md:text-[32px] font-bold tracking-widest text-primary hover:opacity-80 transition-opacity duration-300 absolute left-1/2 -translate-x-1/2 uppercase"
+          className="font-display-lg text-[22px] md:text-[32px] font-bold tracking-widest text-primary hover:opacity-80 transition-opacity duration-300 absolute left-1/2 -translate-x-1/2 uppercase z-10 bg-transparent border-none cursor-pointer"
         >
           RANGOVA
         </button>

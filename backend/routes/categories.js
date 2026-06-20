@@ -15,7 +15,7 @@ router.post('/', adminAuth, async (req, res) => {
   if (error) return res.status(500).json({ error: error.message });
   
   // Log activity
-  logActivity(req.user?.username, 'Create Category', `Created category "${data.name}" (ID: ${data.id})`);
+  logActivity(req.user?.username, 'Create Category', `Created category "${data.title || data.name}" (ID: ${data.id})`);
   
   res.status(201).json(data);
 });
@@ -25,20 +25,20 @@ router.put('/:id', adminAuth, async (req, res) => {
   if (error) return res.status(500).json({ error: error.message });
   
   // Log activity
-  logActivity(req.user?.username, 'Update Category', `Updated category "${data.name}" (ID: ${data.id})`);
+  logActivity(req.user?.username, 'Update Category', `Updated category "${data.title || data.name}" (ID: ${data.id})`);
   
   res.json(data);
 });
 
 router.delete('/:id', adminAuth, async (req, res) => {
   // Fetch details first to log the name
-  const { data: cat } = await supabase.from('categories').select('name').eq('id', req.params.id).single();
+  const { data: cat } = await supabase.from('categories').select('title, name').eq('id', req.params.id).single();
   
   const { error } = await supabase.from('categories').delete().eq('id', req.params.id);
   if (error) return res.status(500).json({ error: error.message });
   
   // Log activity
-  logActivity(req.user?.username, 'Delete Category', `Deleted category "${cat?.name || 'Unknown'}" (ID: ${req.params.id})`);
+  logActivity(req.user?.username, 'Delete Category', `Deleted category "${cat?.title || cat?.name || 'Unknown'}" (ID: ${req.params.id})`);
   
   res.json({ success: true });
 });

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { getInventory, addInventory, updateInventory, deleteInventory } from '../../lib/api';
+import ConfirmModal from '../ConfirmModal';
 
 export default function AdminInventory({ products = [], triggerNotification, onRefresh, loading }) {
   const [inventoryList, setInventoryList] = useState([]);
@@ -8,6 +9,8 @@ export default function AdminInventory({ products = [], triggerNotification, onR
   const [showAddModal, setShowAddModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [localLoading, setLocalLoading] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
+  const [visibleCount, setVisibleCount] = useState(20);
 
   const [addForm, setAddForm] = useState({
     product_id: '',
@@ -59,6 +62,23 @@ export default function AdminInventory({ products = [], triggerNotification, onR
     });
   }, [inventoryList, searchQuery, products]);
 
+  React.useEffect(() => {
+    setVisibleCount(20);
+  }, [searchQuery, products]);
+
+  const displayedInventory = useMemo(() => filteredInventory.slice(0, visibleCount), [filteredInventory, visibleCount]);
+
+  const loadMoreRef = React.useRef(null);
+  React.useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && visibleCount < filteredInventory.length) {
+        setVisibleCount(prev => prev + 20);
+      }
+    });
+    if (loadMoreRef.current) observer.observe(loadMoreRef.current);
+    return () => observer.disconnect();
+  }, [visibleCount, filteredInventory.length]);
+
   const handleSelectItem = (item) => {
     setSelectedItem(item);
     setEditQty(item.stock_qty);
@@ -105,11 +125,15 @@ export default function AdminInventory({ products = [], triggerNotification, onR
     }
   };
 
-  const handleDeleteItem = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this inventory record?')) return;
+  const handleDeleteItem = (id) => {
+    setItemToDelete(id);
+  };
+
+  const confirmDeleteItem = async () => {
+    if (!itemToDelete) return;
     try {
       setLocalLoading(true);
-      await deleteInventory(id);
+      await deleteInventory(itemToDelete);
       triggerNotification('Inventory record deleted');
       setSelectedItem(null);
       fetchInventoryData();
@@ -117,6 +141,7 @@ export default function AdminInventory({ products = [], triggerNotification, onR
       triggerNotification(`Error deleting inventory record: ${err.message || err}`);
     } finally {
       setLocalLoading(false);
+      setItemToDelete(null);
     }
   };
 
@@ -127,7 +152,7 @@ export default function AdminInventory({ products = [], triggerNotification, onR
   }, [addForm.product_id, products]);
 
   return (
-    <div className="flex-1 flex flex-col md:flex-row gap-6 overflow-hidden">
+    <div className="flex-1 flex flex-col md:flex-row gap-6 h-full overflow-hidden">
       {/* Left panel - Inventory table list */}
       <div className="flex-grow flex flex-col min-w-0 bg-white border border-outline-variant/30 rounded-lg shadow-sm">
         {/* Toolbar */}
@@ -181,7 +206,7 @@ export default function AdminInventory({ products = [], triggerNotification, onR
                 </tr>
               </thead>
               <tbody className="divide-y divide-outline-variant/10 text-sm">
-                {filteredInventory.map(item => {
+                {displayedInventory.map(item => {
                   const prod = getProductInfo(item.product_id);
                   const isSelected = selectedItem?.id === item.id;
                   return (
@@ -217,6 +242,11 @@ export default function AdminInventory({ products = [], triggerNotification, onR
                     </tr>
                   );
                 })}
+                {visibleCount < filteredInventory.length && (
+                  <tr ref={loadMoreRef}>
+                    <td colSpan="5" className="py-4 text-center text-secondary">Loading more...</td>
+                  </tr>
+                )}
               </tbody>
             </table>
           )}
@@ -398,6 +428,13 @@ export default function AdminInventory({ products = [], triggerNotification, onR
           </div>
         </div>
       )}
+      {/* Confirm Delete Modal */}
+      <ConfirmModal
+        isOpen={!!itemToDelete}
+        onConfirm={confirmDeleteItem}
+        onCancel={() => setItemToDelete(null)}
+        message="Are you sure you want to delete this inventory record? This action cannot be undone."
+      />
     </div>
   );
 }

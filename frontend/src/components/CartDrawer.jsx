@@ -1,10 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { getShippingSettings } from '../lib/api';
 
 export default function CartDrawer({ isCartOpen, setIsCartOpen, cart, updateQuantity, totalItemsCount, subtotal, navigateTo, discount }) {
+  const [shippingConfig, setShippingConfig] = useState({ threshold: 999, charge: 50 });
+
+  useEffect(() => {
+    if (isCartOpen) {
+      getShippingSettings().then(setShippingConfig);
+    }
+  }, [isCartOpen]);
+
   if (!isCartOpen) return null;
 
-  // Free Shipping Threshold: ₹25,000
-  const shippingThreshold = 25000;
+  // Free Shipping Threshold logic
+  const shippingThreshold = shippingConfig.threshold;
   const progressPercent = Math.min((subtotal / shippingThreshold) * 100, 100);
   const remainingForFreeShipping = shippingThreshold - subtotal;
 
@@ -134,20 +143,10 @@ export default function CartDrawer({ isCartOpen, setIsCartOpen, cart, updateQuan
               <span className="font-price-lg text-sm font-bold">₹{subtotal.toLocaleString()}</span>
             </div>
             
-            {discount && discount.active && (
-              <div className="flex justify-between items-center text-green-700 mb-2">
-                <span className="font-display-lg text-sm font-bold uppercase tracking-wide flex items-center gap-2">
-                  <span className="material-symbols-outlined text-[16px]">loyalty</span>
-                  Discount ({discount.percent}%)
-                </span>
-                <span className="font-price-lg text-sm font-bold">-₹{Math.round(subtotal * (discount.percent/100)).toLocaleString()}</span>
-              </div>
-            )}
-            
             <div className="flex justify-between items-center border-t border-outline-variant/20 pt-4 mt-2">
               <span className="font-display-lg text-lg font-bold text-primary uppercase tracking-wide">Estimated Total</span>
               <span className="font-price-lg text-xl text-primary font-bold">
-                ₹{(discount && discount.active ? Math.round(subtotal * (1 - discount.percent/100)) : subtotal).toLocaleString()}
+                ₹{(subtotal + (subtotal >= shippingThreshold ? 0 : shippingConfig.charge)).toLocaleString()}
               </span>
             </div>
             <p className="text-[10px] text-secondary tracking-wide italic leading-normal">Taxes, shipping, and promotional reductions are finalized inside the secure checkout.</p>

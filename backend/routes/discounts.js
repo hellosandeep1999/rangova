@@ -11,8 +11,8 @@ router.get('/', async (req, res) => {
 });
 
 router.get('/active', async (req, res) => {
-  const { data, error } = await supabase.from('discounts').select('*').eq('active', true).limit(1).single();
-  if (error) return res.json(null);
+  const { data, error } = await supabase.from('discounts').select('*').eq('active', true);
+  if (error) return res.json([]);
   res.json(data);
 });
 
@@ -20,8 +20,7 @@ router.post('/', adminAuth, async (req, res) => {
   const { data, error } = await supabase.from('discounts').insert([req.body]).select().single();
   if (error) return res.status(500).json({ error: error.message });
   
-  // Log activity
-  logActivity(req.user?.username, 'Create Discount', `Created discount code "${data.code}" (${data.percent}% off)`);
+  logActivity(req.user?.username, 'Added Discount', `Added discount code "${data.code}" (${data.percent}% off, type: ${data.type || 'all_orders'})`);
   
   res.status(201).json(data);
 });
@@ -30,8 +29,7 @@ router.put('/:id', adminAuth, async (req, res) => {
   const { data, error } = await supabase.from('discounts').update(req.body).eq('id', req.params.id).select().single();
   if (error) return res.status(500).json({ error: error.message });
   
-  // Log activity
-  logActivity(req.user?.username, 'Update Discount', `Updated discount code "${data.code}" (Active: ${data.active})`);
+  logActivity(req.user?.username, 'Updated Discount', `Updated discount code "${data.code}" (Active: ${data.active}, Type: ${data.type || 'all_orders'})`);
   
   res.json(data);
 });
@@ -42,8 +40,7 @@ router.delete('/:id', adminAuth, async (req, res) => {
   const { error } = await supabase.from('discounts').delete().eq('id', req.params.id);
   if (error) return res.status(500).json({ error: error.message });
   
-  // Log activity
-  logActivity(req.user?.username, 'Delete Discount', `Deleted discount code "${disc?.code || 'Unknown'}" (ID: ${req.params.id})`);
+  logActivity(req.user?.username, 'Deleted Discount', `Deleted discount code "${disc?.code || 'Unknown'}" (ID: ${req.params.id})`);
   
   res.json({ success: true });
 });

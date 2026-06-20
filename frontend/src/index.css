@@ -101,3 +101,14 @@ body {
   0%   { transform: translateX(0); }
   100% { transform: translateX(-50%); }
 }
+
+@keyframes marqueeInfinite {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.animate-marquee {
+  animation: marqueeInfinite 20s linear infinite;
+}
+.pl-full {
+  padding-left: 100%;
+}

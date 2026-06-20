@@ -21,8 +21,8 @@ router.put('/:id', adminAuth, async (req, res) => {
   // Log activity
   logActivity(
     req.user?.username,
-    'Update Inventory',
-    `Updated inventory quantity for product ID ${current?.product_id || 'Unknown'} (${current?.size || '-'}/${current?.color || '-'}) from ${current?.stock_qty || 0} to ${stock_qty}`
+    'Updated Inventory',
+    `Updated inventory for product ID ${current?.product_id || 'Unknown'} (${current?.size || '-'}/${current?.color || '-'}) from ${current?.stock_qty || 0} to ${stock_qty}`
   );
   
   res.json(data);
@@ -35,7 +35,7 @@ router.post('/', adminAuth, async (req, res) => {
   // Log activity
   logActivity(
     req.user?.username,
-    'Add Inventory',
+    'Added Inventory',
     `Added inventory of ${data.stock_qty} for product ID ${data.product_id} (${data.size || '-'}/${data.color || '-'})`
   );
   
@@ -51,7 +51,7 @@ router.delete('/:id', adminAuth, async (req, res) => {
   // Log activity
   logActivity(
     req.user?.username,
-    'Delete Inventory',
+    'Deleted Inventory',
     `Deleted inventory item ID: ${req.params.id} for product ID ${item?.product_id || 'Unknown'} (${item?.size || '-'}/${item?.color || '-'})`
   );
   

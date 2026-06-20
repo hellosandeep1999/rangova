@@ -1,6 +1,12 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { getAllSettings } from '../lib/api';
 
 export default function Footer({ navigateTo, triggerNotification }) {
+  const [settings, setSettings] = useState({});
+
+  useEffect(() => {
+    getAllSettings().then(setSettings).catch(console.error);
+  }, []);
   return (
     <footer className="bg-primary text-on-primary pt-12 pb-8 border-t border-surface-variant/30 text-left">
       <div className="grid grid-cols-1 md:grid-cols-12 gap-gutter px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
@@ -9,23 +15,24 @@ export default function Footer({ navigateTo, triggerNotification }) {
         <div className="col-span-12 md:col-span-4 flex flex-col mb-6 md:mb-0 space-y-3">
           <button
             onClick={() => navigateTo('home')}
-            className="font-headline-xl text-[24px] md:text-[32px] text-white tracking-tighter block text-left bg-transparent border-none p-0 hover:opacity-80 transition-opacity cursor-pointer w-fit"
+            className="font-headline-xl text-[24px] md:text-[32px] text-white tracking-tighter block text-left bg-transparent border-none p-0 hover:opacity-80 transition-opacity cursor-pointer w-fit uppercase"
           >
-            RANGOVA
+            {settings.store_name || 'RANGOVA'}
           </button>
           <p className="font-body-md text-sm text-white/60 max-w-xs leading-relaxed">
-            Ancestral craft, modern minimalism. Elevating the everyday with premium hand-blocked heritage textiles.
+            {settings.company_description || 'Ancestral craft, modern minimalism. Elevating the everyday with premium hand-blocked heritage textiles.'}
           </p>
           {/* Physical address & contact */}
           <div className="pt-2 space-y-1.5 text-white/50 text-xs font-body-md">
-            <p>108, Craft Boulevard, Sector 5</p>
-            <p>Mansarovar, Jaipur – 302020, Rajasthan</p>
+            <p className="whitespace-pre-line">{settings.company_address || '108, Craft Boulevard, Sector 5\nMansarovar, Jaipur – 302020, Rajasthan'}</p>
             <p className="pt-1">
-              <a href="mailto:care@rangova.com" className="hover:text-dusty-gold transition-colors">care@rangova.com</a>
+              <a href={`mailto:${settings.contact_email || 'care@rangova.com'}`} className="hover:text-dusty-gold transition-colors">{settings.contact_email || 'care@rangova.com'}</a>
             </p>
-            <p>
-              <a href="tel:+911414098122" className="hover:text-dusty-gold transition-colors">+91 141 409 8122</a>
-            </p>
+            {settings.support_phone && (
+              <p>
+                <a href={`tel:${settings.support_phone}`} className="hover:text-dusty-gold transition-colors">Support: {settings.support_phone}</a>
+              </p>
+            )}
           </div>
         </div>
 
@@ -73,10 +80,11 @@ export default function Footer({ navigateTo, triggerNotification }) {
       </div>
 
       <div className="px-margin-mobile md:px-margin-desktop mt-10 pt-5 border-t border-white/10 max-w-container-max mx-auto flex flex-col md:flex-row justify-between items-center text-xs text-white/40">
-        <p className="font-label-caps text-label-caps text-[10px] tracking-widest text-center md:text-left">
-          © 2026 RANGOVA. ALL RIGHTS RESERVED. ANCESTRAL CRAFT, MODERN MINIMALISM.
+        <p className="font-label-caps text-label-caps text-[10px] tracking-widest text-center md:text-left uppercase">
+          © {new Date().getFullYear()} {settings.store_name || 'RANGOVA'}. ALL RIGHTS RESERVED.
         </p>
         <div className="flex space-x-4 mt-3 md:mt-0 text-white/30 text-[10px] font-label-caps tracking-widest">
+          {settings.currency && <span>Currency: {settings.currency}</span>}
           <span>Made in Jaipur, India 🇮🇳</span>
         </div>
       </div>

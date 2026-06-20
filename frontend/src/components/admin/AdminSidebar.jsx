@@ -42,6 +42,8 @@ export default function AdminSidebar({
               { id: 'inventory', label: 'Inventory', icon: 'warehouse' },
               { id: 'discounts', label: 'Discounts', icon: 'local_offer' },
               { id: 'transactions', label: 'Transactions', icon: 'receipt_long' },
+              { id: 'hero', label: 'Hero Carousel', icon: 'view_carousel' },
+              { id: 'testimonials', label: 'Voice of Rangova', icon: 'forum' },
               { id: 'settings', label: 'Settings', icon: 'settings' },
               { id: 'activity', label: 'Activity Log', icon: 'history' },
             ].map(tab => (

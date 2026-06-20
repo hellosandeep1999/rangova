@@ -1,12 +1,73 @@
-import React, { useState } from 'react';
-import { placeOrder } from '../lib/api';
+import React, { useState, useEffect } from 'react';
+import { placeOrder, getShippingSettings } from '../lib/api';
 
-export default function Checkout({ cart, subtotal, navigateTo, setIsCartOpen, setCart, triggerNotification, currentUser, discount }) {
+export default function Checkout({ cart, subtotal, navigateTo, setIsCartOpen, setCart, triggerNotification, currentUser }) {
   const [selectedAddress, setSelectedAddress] = useState(currentUser?.addresses?.[0] || 'new');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [shippingConfig, setShippingConfig] = useState({ threshold: 999, charge: 50 });
+  const [checkoutEmail, setCheckoutEmail] = useState(currentUser?.email || '');
+  const [hasPastOrders, setHasPastOrders] = useState(false);
+  
+  const [allDiscounts, setAllDiscounts] = useState([]);
+  const [selectedDiscountId, setSelectedDiscountId] = useState(null);
 
-  const discountAmount = discount && discount.active ? Math.round(subtotal * (discount.percent/100)) : 0;
-  const finalTotal = subtotal - discountAmount;
+  useEffect(() => {
+    const fetchDiscounts = async () => {
+      try {
+        const { getActiveDiscount } = await import('../lib/api');
+        const data = await getActiveDiscount(); // Now returns an array
+        if (Array.isArray(data) && data.length > 0) {
+          setAllDiscounts(data);
+        }
+      } catch (e) {}
+    };
+    fetchDiscounts();
+  }, []);
+
+  useEffect(() => {
+    const fetchEmailStatus = async () => {
+      if (checkoutEmail) {
+        try {
+          const { getOrdersByEmail } = await import('../lib/api');
+          const orders = await getOrdersByEmail(checkoutEmail);
+          setHasPastOrders(orders && orders.length > 0);
+        } catch (e) {
+          setHasPastOrders(false);
+        }
+      } else {
+        setHasPastOrders(false);
+      }
+    };
+    fetchEmailStatus();
+  }, [checkoutEmail]);
+
+  // Auto-apply best discount initially if none is selected
+  useEffect(() => {
+    if (allDiscounts.length === 0 || selectedDiscountId !== null) return;
+    const valid = allDiscounts.filter(d => d.discount_type !== 'first_order' || !hasPastOrders);
+    if (valid.length > 0) {
+      valid.sort((a, b) => b.percent - a.percent);
+      setSelectedDiscountId(valid[0].id);
+    }
+  }, [allDiscounts, hasPastOrders, selectedDiscountId]);
+
+  useEffect(() => {
+    getShippingSettings().then(setShippingConfig);
+  }, []);
+
+  const selectedDiscount = allDiscounts.find(d => d.id === selectedDiscountId);
+  let isDiscountValid = false;
+  if (selectedDiscount) {
+    if (selectedDiscount.discount_type === 'first_order') {
+      isDiscountValid = !hasPastOrders;
+    } else {
+      isDiscountValid = true;
+    }
+  }
+
+  const discountAmount = isDiscountValid && selectedDiscount ? Math.round(subtotal * (selectedDiscount.percent/100)) : 0;
+  const shippingCost = subtotal >= shippingConfig.threshold ? 0 : shippingConfig.charge;
+  const finalTotal = subtotal - discountAmount + shippingCost;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,6 +78,11 @@ export default function Checkout({ cart, subtotal, navigateTo, setIsCartOpen, se
 
     const fd = new FormData(e.target);
     const data = Object.fromEntries(fd.entries());
+
+    if (data.phone && !/^\d{10}$/.test(data.phone)) {
+      triggerNotification('Mobile number must be exactly 10 digits');
+      return;
+    }
 
     setIsSubmitting(true);
     try {
@@ -37,6 +103,7 @@ export default function Checkout({ cart, subtotal, navigateTo, setIsCartOpen, se
         total: finalTotal,
         subtotal: subtotal,
         discount_amount: discountAmount,
+        shipping_charge: shippingCost,
         shipping_address: shippingAddress,
         city: city,
         state: state,
@@ -57,7 +124,16 @@ export default function Checkout({ cart, subtotal, navigateTo, setIsCartOpen, se
       navigateTo('home');
     } catch (err) {
       console.error(err);
-      triggerNotification('Failed to place order. Please try again.');
+      if (err.message.includes('blocked')) {
+        try {
+          const parsed = JSON.parse(err.message);
+          triggerNotification(parsed.error || 'You are blocked please contact from our support team');
+        } catch {
+          triggerNotification('You are blocked please contact from our support team');
+        }
+      } else {
+        triggerNotification('Failed to place order. Please try again.');
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -104,7 +180,8 @@ export default function Checkout({ cart, subtotal, navigateTo, setIsCartOpen, se
                 name="email"
                 required
                 type="email"
-                defaultValue={currentUser?.email || ''}
+                value={checkoutEmail}
+                onChange={(e) => setCheckoutEmail(e.target.value)}
                 placeholder="Email Address"
                 className="w-full bg-transparent border-0 border-b border-outline-variant focus:border-primary focus:ring-0 py-3 text-sm rounded-none"
               />
@@ -147,9 +224,10 @@ export default function Checkout({ cart, subtotal, navigateTo, setIsCartOpen, se
                     <input name="state" required type="text" placeholder="State" className="w-full bg-transparent border-0 border-b border-outline-variant focus:border-primary focus:ring-0 py-3 text-sm rounded-none" />
                     <input name="pincode" required type="text" placeholder="PIN Code" className="w-full bg-transparent border-0 border-b border-outline-variant focus:border-primary focus:ring-0 py-3 text-sm rounded-none" />
                   </div>
-                  <input name="phone" required type="tel" placeholder="Phone Number" className="w-full bg-transparent border-0 border-b border-outline-variant focus:border-primary focus:ring-0 py-3 text-sm rounded-none" />
                 </>
               )}
+              
+              <input name="phone" required pattern="\d{10}" title="Please enter exactly 10 digits" type="tel" defaultValue={currentUser?.phone || ''} placeholder="Mobile Number (10 digits required)" className="w-full bg-transparent border-0 border-b border-outline-variant focus:border-primary focus:ring-0 py-3 text-sm rounded-none" />
             </section>
 
             <div className="flex flex-col-reverse md:flex-row md:justify-between md:items-center gap-4 pt-5 border-t border-outline-variant/20">
@@ -193,19 +271,55 @@ export default function Checkout({ cart, subtotal, navigateTo, setIsCartOpen, se
               ))}
             </div>
             <div className="border-t border-outline-variant/20 pt-5 mt-5 space-y-3 text-sm">
+              {allDiscounts.length > 0 && (
+                <div className="py-3 border-y border-outline-variant/20 mb-3 space-y-2">
+                  <h4 className="font-label-caps text-[10px] text-secondary tracking-widest uppercase mb-2">Available Coupons</h4>
+                  {allDiscounts.map(d => {
+                    const isValid = d.discount_type !== 'first_order' || !hasPastOrders;
+                    const isSelected = selectedDiscountId === d.id;
+                    return (
+                      <div 
+                        key={d.id} 
+                        onClick={() => setSelectedDiscountId(isSelected ? null : d.id)}
+                        className={`p-3 border text-xs cursor-pointer transition-colors flex justify-between items-center ${isSelected ? 'border-primary bg-primary/5 text-primary' : 'border-outline-variant/30 text-secondary hover:border-outline-variant/60'}`}
+                      >
+                        <div>
+                          <div className="font-bold flex items-center gap-2">
+                            {d.code} <span className="text-[10px] bg-surface-container px-1.5 py-0.5 rounded font-normal">{d.percent}% OFF</span>
+                          </div>
+                          {!isValid && isSelected && (
+                            <div className="text-[10px] text-muted-terracotta mt-1">Valid for first-time orders only.</div>
+                          )}
+                        </div>
+                        <div className="w-4 h-4 rounded-full border flex items-center justify-center border-primary">
+                          {isSelected && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
               <div className="flex justify-between text-secondary">
                 <span>Subtotal</span>
                 <span className="text-primary font-bold">₹{subtotal.toLocaleString()}</span>
               </div>
-              {discount && discount.active && (
+              {isDiscountValid && selectedDiscount && (
                 <div className="flex justify-between text-green-700">
-                  <span className="flex items-center gap-1.5"><span className="material-symbols-outlined text-[14px]">loyalty</span> Discount ({discount.percent}%)</span>
+                  <span className="flex items-center gap-1.5"><span className="material-symbols-outlined text-[14px]">loyalty</span> Discount ({selectedDiscount.percent}%)</span>
                   <span className="font-bold">-₹{discountAmount.toLocaleString()}</span>
+                </div>
+              )}
+              {selectedDiscount && !isDiscountValid && selectedDiscount.discount_type === 'first_order' && checkoutEmail && (
+                <div className="text-xs text-muted-terracotta">
+                  Discount code is valid for first-time orders only.
                 </div>
               )}
               <div className="flex justify-between text-secondary">
                 <span>Shipping</span>
-                <span className="text-primary font-bold italic">FREE Express</span>
+                <span className="text-primary font-bold">
+                  {shippingCost === 0 ? <i className="italic">FREE Express</i> : `₹${shippingCost}`}
+                </span>
               </div>
               <div className="flex justify-between items-center text-primary font-bold text-base pt-4 border-t border-primary/10">
                 <span>Total</span>

@@ -12,6 +12,8 @@ import AdminDiscounts from '../components/admin/AdminDiscounts';
 import AdminTransactions from '../components/admin/AdminTransactions';
 import AdminSettings from '../components/admin/AdminSettings';
 import AdminActivity from '../components/admin/AdminActivity';
+import AdminHero from '../components/admin/AdminHero';
+import AdminTestimonials from '../components/admin/AdminTestimonials';
 
 export default function Admin({ navigateTo, triggerNotification }) {
   const [isAuthenticated, setIsAuthenticated] = useState(isAdminLoggedIn());
@@ -50,7 +52,7 @@ export default function Admin({ navigateTo, triggerNotification }) {
     try {
       setLoading(true);
       const [prods, ords, custs, cats] = await Promise.all([
-        getProducts(), getOrders(), getCustomers(), getCategories()
+        getProducts(true), getOrders(), getCustomers(), getCategories()
       ]);
       setProducts(Array.isArray(prods) ? prods : []);
       setOrders(Array.isArray(ords) ? ords : []);
@@ -65,7 +67,7 @@ export default function Admin({ navigateTo, triggerNotification }) {
   };
 
   const fetchProducts = async () => {
-    try { setLoading(true); const data = await getProducts(); setProducts(Array.isArray(data) ? data : []); const cats = await getCategories(); setCategories(Array.isArray(cats) ? cats : []); }
+    try { setLoading(true); const data = await getProducts(true); setProducts(Array.isArray(data) ? data : []); const cats = await getCategories(); setCategories(Array.isArray(cats) ? cats : []); }
     catch (err) { triggerNotification(`Error loading products: ${err.message || err}`); }
     finally { setLoading(false); }
   };
@@ -217,7 +219,7 @@ export default function Admin({ navigateTo, triggerNotification }) {
       />
 
       {/* Main Content */}
-      <div className="flex-1 overflow-y-auto bg-surface-container-low p-4 md:p-8 flex flex-col">
+      <div className="flex-1 overflow-hidden bg-surface-container-low p-4 md:p-8 flex flex-col">
         {/* Mobile Header Toggle */}
         <div className="md:hidden flex justify-between items-center mb-4">
           <h1 className="font-display-lg text-xl tracking-widest uppercase text-primary">Admin</h1>
@@ -227,89 +229,121 @@ export default function Admin({ navigateTo, triggerNotification }) {
         </div>
 
         {activeTab === 'dashboard' && (
-          <AdminDashboard 
-            stats={stats} 
-            chartFilter={chartFilter} 
-            setChartFilter={setChartFilter} 
-            chartData={chartData} 
-          />
+          <div className="flex-1 overflow-y-auto">
+            <AdminDashboard 
+              stats={stats} 
+              chartFilter={chartFilter} 
+              setChartFilter={setChartFilter} 
+              chartData={chartData} 
+            />
+          </div>
         )}
 
         {activeTab === 'products' && (
-          <AdminProducts 
-            products={products}
-            setProducts={setProducts}
-            categories={categories}
-            triggerNotification={triggerNotification}
-            onRefresh={fetchProducts}
-            loading={loading}
-          />
+          <div className="flex-1 overflow-hidden flex flex-col">
+            <AdminProducts 
+              products={products}
+              setProducts={setProducts}
+              categories={categories}
+              triggerNotification={triggerNotification}
+              onRefresh={fetchProducts}
+              loading={loading}
+            />
+          </div>
         )}
 
         {activeTab === 'orders' && (
-          <AdminOrders 
-            orders={orders}
-            setOrders={setOrders}
-            triggerNotification={triggerNotification}
-            onRefresh={fetchOrders}
-            loading={loading}
-          />
+          <div className="flex-1 overflow-hidden flex flex-col">
+            <AdminOrders 
+              orders={orders}
+              setOrders={setOrders}
+              triggerNotification={triggerNotification}
+              onRefresh={fetchOrders}
+              loading={loading}
+            />
+          </div>
         )}
 
         {activeTab === 'customers' && (
-          <AdminCustomers 
-            customers={customers}
-            triggerNotification={triggerNotification}
-            onRefresh={fetchCustomers}
-            loading={loading}
-          />
+          <div className="flex-1 overflow-hidden flex flex-col">
+            <AdminCustomers 
+              customers={customers}
+              triggerNotification={triggerNotification}
+              onRefresh={fetchCustomers}
+              loading={loading}
+            />
+          </div>
         )}
 
         {activeTab === 'categories' && (
-          <AdminCategories 
-            categories={categories}
-            setCategories={setCategories}
-            triggerNotification={triggerNotification}
-            onRefresh={fetchCategories}
-            loading={loading}
-          />
+          <div className="flex-1 overflow-hidden flex flex-col">
+            <AdminCategories 
+              categories={categories}
+              setCategories={setCategories}
+              triggerNotification={triggerNotification}
+              onRefresh={fetchCategories}
+              loading={loading}
+            />
+          </div>
         )}
 
         {activeTab === 'inventory' && (
-          <AdminInventory 
-            products={products}
-            triggerNotification={triggerNotification}
-            onRefresh={fetchProducts}
-            loading={loading}
-          />
+          <div className="flex-1 overflow-hidden flex flex-col">
+            <AdminInventory 
+              products={products}
+              triggerNotification={triggerNotification}
+              onRefresh={fetchProducts}
+              loading={loading}
+            />
+          </div>
         )}
 
         {activeTab === 'discounts' && (
-          <AdminDiscounts 
-            triggerNotification={triggerNotification}
-            loading={loading}
-          />
+          <div className="flex-1 overflow-hidden flex flex-col">
+            <AdminDiscounts 
+              triggerNotification={triggerNotification}
+              loading={loading}
+            />
+          </div>
         )}
 
         {activeTab === 'transactions' && (
-          <AdminTransactions 
-            orders={orders}
-            triggerNotification={triggerNotification}
-            loading={loading}
-          />
+          <div className="flex-1 overflow-hidden flex flex-col">
+            <AdminTransactions 
+              orders={orders}
+              triggerNotification={triggerNotification}
+              loading={loading}
+            />
+          </div>
+        )}
+
+        {activeTab === 'hero' && (
+          <div className="flex-1 overflow-y-auto">
+            <AdminHero triggerNotification={triggerNotification} />
+          </div>
+        )}
+
+        {activeTab === 'testimonials' && (
+          <div className="flex-1 overflow-y-auto">
+            <AdminTestimonials triggerNotification={triggerNotification} />
+          </div>
         )}
 
         {activeTab === 'settings' && (
-          <AdminSettings 
-            triggerNotification={triggerNotification}
-          />
+          <div className="flex-1 overflow-hidden flex flex-col">
+            <AdminSettings 
+              triggerNotification={triggerNotification}
+            />
+          </div>
         )}
 
         {activeTab === 'activity' && (
-          <AdminActivity 
-            triggerNotification={triggerNotification}
-            loading={loading}
-          />
+          <div className="flex-1 overflow-hidden flex flex-col">
+            <AdminActivity 
+              triggerNotification={triggerNotification}
+              loading={loading}
+            />
+          </div>
         )}
       </div>
     </div>

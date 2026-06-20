@@ -61,7 +61,55 @@ function App() {
   const [categoryFilter, setCategoryFilter] = useState('All');
 
   const [currentUser, setCurrentUser] = useState(null);
-  const [discount, setDiscount] = useState({ active: true, text: 'USE CODE RANGOVA10 FOR 10% OFF YOUR FIRST ORDER', percent: 10 });
+  const [discount, setDiscount] = useState(null);
+
+  useEffect(() => {
+    const initAuth = async () => {
+      const { supabase } = await import('./lib/api');
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        const { data: customerData } = await supabase.from('customers').select('*').eq('email', session.user.email).single();
+        setCurrentUser({
+          ...session.user,
+          name: session.user.user_metadata?.first_name ? `${session.user.user_metadata.first_name} ${session.user.user_metadata.last_name}` : session.user.email.split('@')[0],
+          phone: session.user.user_metadata?.phone || '',
+          addresses: customerData?.addresses || []
+        });
+      }
+
+      supabase.auth.onAuthStateChange(async (_event, session) => {
+        if (session?.user) {
+          const { data: customerData } = await supabase.from('customers').select('*').eq('email', session.user.email).single();
+          setCurrentUser({
+            ...session.user,
+            name: session.user.user_metadata?.first_name ? `${session.user.user_metadata.first_name} ${session.user.user_metadata.last_name}` : session.user.email.split('@')[0],
+            phone: session.user.user_metadata?.phone || '',
+            addresses: customerData?.addresses || []
+          });
+        } else {
+          setCurrentUser(null);
+        }
+      });
+    };
+    initAuth();
+  }, []);
+
+  useEffect(() => {
+    const fetchDiscount = async () => {
+      try {
+        const { getActiveDiscount } = await import('./lib/api');
+        const active = await getActiveDiscount();
+        if (active && active.length > 0) {
+          setDiscount(active);
+        } else {
+          setDiscount(null);
+        }
+      } catch (err) {
+        setDiscount(null);
+      }
+    };
+    fetchDiscount();
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => setIsHeaderShrunk(window.scrollY > 50);
@@ -172,7 +220,7 @@ function App() {
           <Home {...sharedProps} setCategoryFilter={setCategoryFilter} />
         )}
         {currentPage === 'shop' && (
-          <Shop {...sharedProps} />
+          <Shop {...sharedProps} categoryFilter={categoryFilter} setCategoryFilter={setCategoryFilter} />
         )}
         {currentPage === 'search' && (
           <Search {...sharedProps} />

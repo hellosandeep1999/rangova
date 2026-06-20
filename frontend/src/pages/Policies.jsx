@@ -1,7 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
+import { getSetting } from '../lib/api';
 
 export default function Policies({ navigateTo }) {
   const [activeTab, setActiveTab] = useState('shipping');
+  const [shippingPolicy, setShippingPolicy] = useState('');
+  const [tosPolicy, setTosPolicy] = useState('');
+
+  useEffect(() => {
+    getSetting('policy_shipping').then(data => {
+      if (data) setShippingPolicy(data.value || data);
+    });
+    getSetting('policy_tos').then(data => {
+      if (data) setTosPolicy(data.value || data);
+    });
+  }, []);
 
   return (
     <div className="w-full min-h-[85vh] bg-warm-ivory py-16 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto text-left animate-fadeIn">
@@ -35,33 +48,39 @@ export default function Policies({ navigateTo }) {
             <div className="space-y-6">
               <h2 className="font-display-lg text-xl font-bold text-primary uppercase tracking-wider mb-4 border-b border-outline-variant/20 pb-2">Shipping & Returns</h2>
               
-              <section className="space-y-2">
-                <h3 className="font-bold text-primary text-sm uppercase tracking-wide">Complimentary Shipping</h3>
-                <p>
-                  Rangova offers complimentary standard shipping within India on all orders. Each garment is handcrafted upon order confirmation and will be dispatched within 4–7 business days. Express shipping options are available at checkout.
-                </p>
-              </section>
+              {shippingPolicy ? (
+                <div className="prose prose-sm max-w-none prose-headings:font-bold prose-headings:text-primary prose-headings:text-sm prose-headings:uppercase prose-headings:tracking-wide" dangerouslySetInnerHTML={{ __html: shippingPolicy }} />
+              ) : (
+                <>
+                  <section className="space-y-2">
+                    <h3 className="font-bold text-primary text-sm uppercase tracking-wide">Complimentary Shipping</h3>
+                    <p>
+                      Rangova offers complimentary standard shipping within India on all orders. Each garment is handcrafted upon order confirmation and will be dispatched within 4–7 business days. Express shipping options are available at checkout.
+                    </p>
+                  </section>
 
-              <section className="space-y-2">
-                <h3 className="font-bold text-primary text-sm uppercase tracking-wide">Carbon-Neutral Packaging</h3>
-                <p>
-                  In line with our preservation ethos, all Rangova packages are shipped in plastic-free, carbon-neutral bespoke linen wraps and post-consumer recycled boxes.
-                </p>
-              </section>
+                  <section className="space-y-2">
+                    <h3 className="font-bold text-primary text-sm uppercase tracking-wide">Carbon-Neutral Packaging</h3>
+                    <p>
+                      In line with our preservation ethos, all Rangova packages are shipped in plastic-free, carbon-neutral bespoke linen wraps and post-consumer recycled boxes.
+                    </p>
+                  </section>
 
-              <section className="space-y-2">
-                <h3 className="font-bold text-primary text-sm uppercase tracking-wide">Bespoke Return & Exchange Policy</h3>
-                <p>
-                  We accept returns and size exchanges on unworn, unaltered garments in original packaging within 14 days of delivery. As we craft limited-edition heritage items, custom-tailored orders are ineligible for standard returns, though minor fitting adjustments can be made through our concierge service.
-                </p>
-              </section>
+                  <section className="space-y-2">
+                    <h3 className="font-bold text-primary text-sm uppercase tracking-wide">Bespoke Return & Exchange Policy</h3>
+                    <p>
+                      We accept returns and size exchanges on unworn, unaltered garments in original packaging within 14 days of delivery. As we craft limited-edition heritage items, custom-tailored orders are ineligible for standard returns, though minor fitting adjustments can be made through our concierge service.
+                    </p>
+                  </section>
 
-              <section className="space-y-2">
-                <h3 className="font-bold text-primary text-sm uppercase tracking-wide">How to Initiate a Return</h3>
-                <p>
-                  Simply log into your dashboard, view your previous orders, or reach out to our client concierge via the <button onClick={() => navigateTo('contact')} className="text-muted-terracotta underline hover:opacity-80 inline-block font-semibold bg-transparent border-none p-0 cursor-pointer">Contact Page</button> to request a complimentary home collection.
-                </p>
-              </section>
+                  <section className="space-y-2">
+                    <h3 className="font-bold text-primary text-sm uppercase tracking-wide">How to Initiate a Return</h3>
+                    <p>
+                      Simply log into your dashboard, view your previous orders, or reach out to our client concierge via the <button onClick={() => navigateTo('contact')} className="text-muted-terracotta underline hover:opacity-80 inline-block font-semibold bg-transparent border-none p-0 cursor-pointer">Contact Page</button> to request a complimentary home collection.
+                    </p>
+                  </section>
+                </>
+              )}
             </div>
           ) : (
             <div className="space-y-6">
@@ -69,33 +88,39 @@ export default function Policies({ navigateTo }) {
               
               <p className="text-xs italic text-secondary/70">Last Updated: May 30, 2026</p>
 
-              <section className="space-y-2">
-                <h3 className="font-bold text-primary text-sm uppercase tracking-wide">1. Agreement to Terms</h3>
-                <p>
-                  By accessing the Rangova boutique, you agree to comply with and be bound by these Terms of Service. If you do not agree, please discontinue use immediately.
-                </p>
-              </section>
+              {tosPolicy ? (
+                <div className="prose prose-sm max-w-none prose-headings:font-bold prose-headings:text-primary prose-headings:text-sm prose-headings:uppercase prose-headings:tracking-wide" dangerouslySetInnerHTML={{ __html: tosPolicy }} />
+              ) : (
+                <>
+                  <section className="space-y-2">
+                    <h3 className="font-bold text-primary text-sm uppercase tracking-wide">1. Agreement to Terms</h3>
+                    <p>
+                      By accessing the Rangova boutique, you agree to comply with and be bound by these Terms of Service. If you do not agree, please discontinue use immediately.
+                    </p>
+                  </section>
 
-              <section className="space-y-2">
-                <h3 className="font-bold text-primary text-sm uppercase tracking-wide">2. Artisanal Variance</h3>
-                <p>
-                  Our garments feature natural hand-block prints and vegetable dyes. Minor variations in dye concentration, printing spacing, and weaving texture are inherent characteristics of traditional heritage crafts and do not qualify as structural defects.
-                </p>
-              </section>
+                  <section className="space-y-2">
+                    <h3 className="font-bold text-primary text-sm uppercase tracking-wide">2. Artisanal Variance</h3>
+                    <p>
+                      Our garments feature natural hand-block prints and vegetable dyes. Minor variations in dye concentration, printing spacing, and weaving texture are inherent characteristics of traditional heritage crafts and do not qualify as structural defects.
+                    </p>
+                  </section>
 
-              <section className="space-y-2">
-                <h3 className="font-bold text-primary text-sm uppercase tracking-wide">3. Intellectual Property</h3>
-                <p>
-                  All content, photography, graphics, logo marks, and proprietary fabric designs presented on this site are the exclusive intellectual property of Rangova Boutique and partners.
-                </p>
-              </section>
+                  <section className="space-y-2">
+                    <h3 className="font-bold text-primary text-sm uppercase tracking-wide">3. Intellectual Property</h3>
+                    <p>
+                      All content, photography, graphics, logo marks, and proprietary fabric designs presented on this site are the exclusive intellectual property of Rangova Boutique and partners.
+                    </p>
+                  </section>
 
-              <section className="space-y-2">
-                <h3 className="font-bold text-primary text-sm uppercase tracking-wide">4. Limitation of Liability</h3>
-                <p>
-                  Rangova shall not be liable for any indirect, incidental, or consequential damages resulting from the use or inability to use our website or purchase of handcrafted items.
-                </p>
-              </section>
+                  <section className="space-y-2">
+                    <h3 className="font-bold text-primary text-sm uppercase tracking-wide">4. Limitation of Liability</h3>
+                    <p>
+                      Rangova shall not be liable for any indirect, incidental, or consequential damages resulting from the use or inability to use our website or purchase of handcrafted items.
+                    </p>
+                  </section>
+                </>
+              )}
             </div>
           )}
         </div>

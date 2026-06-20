@@ -6,16 +6,43 @@ const { logActivity } = require('../utils/logger');
 
 // GET all products
 router.get('/', async (req, res) => {
-  const { data, error } = await supabase.from('products').select('*').order('created_at', { ascending: false });
+  const { data: products, error } = await supabase.from('products').select('*').order('created_at', { ascending: false });
   if (error) return res.status(500).json({ error: error.message });
-  res.json(data);
+
+  const { data: inventory, error: iError } = await supabase.from('inventory').select('*');
+  if (iError) return res.status(500).json({ error: iError.message });
+
+  const productsWithStock = products.map(p => {
+    const pInv = inventory.filter(i => i.product_id === p.id);
+    const totalQty = pInv.reduce((acc, curr) => acc + (curr.stock_qty || 0), 0);
+    return {
+      ...p,
+      has_inventory_row: pInv.length > 0,
+      in_stock: totalQty > 0,
+      inventory: pInv
+    };
+  });
+
+  const finalProducts = req.query.admin === 'true' 
+    ? productsWithStock 
+    : productsWithStock.filter(p => p.has_inventory_row);
+
+  res.json(finalProducts);
 });
 
 // GET single product
 router.get('/:id', async (req, res) => {
-  const { data, error } = await supabase.from('products').select('*').eq('id', req.params.id).single();
+  const { data: prod, error } = await supabase.from('products').select('*').eq('id', req.params.id).single();
   if (error) return res.status(404).json({ error: 'Product not found' });
-  res.json(data);
+
+  const { data: pInv } = await supabase.from('inventory').select('*').eq('product_id', prod.id);
+  const totalQty = (pInv || []).reduce((acc, curr) => acc + (curr.stock_qty || 0), 0);
+
+  res.json({
+    ...prod,
+    in_stock: totalQty > 0,
+    inventory: pInv || []
+  });
 });
 
 // POST create product (admin only)
@@ -25,7 +52,7 @@ router.post('/', adminAuth, async (req, res) => {
   if (error) return res.status(500).json({ error: error.message });
   
   // Log activity
-  logActivity(req.user?.username, 'Create Product', `Created product "${data.title}" (ID: ${data.id})`);
+  logActivity(req.user?.username, 'Added Product', `Added product "${data.title}" (ID: ${data.id})`);
   
   res.status(201).json(data);
 });
@@ -36,7 +63,7 @@ router.put('/:id', adminAuth, async (req, res) => {
   if (error) return res.status(500).json({ error: error.message });
   
   // Log activity
-  logActivity(req.user?.username, 'Update Product', `Updated product "${data.title}" (ID: ${data.id})`);
+  logActivity(req.user?.username, 'Updated Product', `Updated product "${data.title}" (ID: ${data.id})`);
   
   res.json(data);
 });
@@ -50,7 +77,7 @@ router.delete('/:id', adminAuth, async (req, res) => {
   if (error) return res.status(500).json({ error: error.message });
   
   // Log activity
-  logActivity(req.user?.username, 'Delete Product', `Deleted product "${prod?.title || 'Unknown'}" (ID: ${req.params.id})`);
+  logActivity(req.user?.username, 'Deleted Product', `Deleted product "${prod?.title || 'Unknown'}" (ID: ${req.params.id})`);
   
   res.json({ success: true });
 });
