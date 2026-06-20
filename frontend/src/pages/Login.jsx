@@ -101,7 +101,8 @@ export default function Login({ navigateTo, triggerNotification, setCurrentUser 
 
       // Sync to customers table
       const fullName = `${regFName} ${regLName}`;
-      await fetch('http://localhost:3001/api/customers/sync', {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+      await fetch(`${apiUrl}/api/customers/sync`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: fullName, email: regEmail, phone: regPhone })

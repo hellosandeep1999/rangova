@@ -301,7 +301,7 @@ export default function AdminOrders({ orders, setOrders, triggerNotification, on
     setScanLoading(true);
     setScanResult(null);
     try {
-      const BASE = 'http://localhost:3001/api';
+      const BASE = `${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api`;
       const token = sessionStorage.getItem('rangova_admin_token');
       // We are scanning the UUID now
       const res = await fetch(`${BASE}/orders/by-id/${encodeURIComponent(val)}`, {
