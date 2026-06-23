@@ -10,6 +10,14 @@ router.get('/', adminAuth, async (req, res) => {
   res.json(data);
 });
 
+// GET check if customer email exists (public - used during signup)
+router.get('/check-email/:email', async (req, res) => {
+  const email = decodeURIComponent(req.params.email);
+  const { data } = await supabase.from('customers').select('id, email').eq('email', email).single();
+  res.json({ exists: !!data });
+});
+
+
 // GET customer orders
 router.get('/:id/orders', adminAuth, async (req, res) => {
   const { data: customer } = await supabase.from('customers').select('email').eq('id', req.params.id).single();
@@ -44,6 +52,7 @@ router.post('/sync', async (req, res) => {
     return res.json(data);
   }
 });
+
 
 // PATCH update customer status (block/unblock)
 router.patch('/:id/status', adminAuth, async (req, res) => {

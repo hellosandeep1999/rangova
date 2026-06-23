@@ -71,9 +71,11 @@ function App() {
         const { data: customerData } = await supabase.from('customers').select('*').eq('email', session.user.email).single();
         setCurrentUser({
           ...session.user,
-          name: session.user.user_metadata?.first_name ? `${session.user.user_metadata.first_name} ${session.user.user_metadata.last_name}` : session.user.email.split('@')[0],
-          phone: session.user.user_metadata?.phone || '',
-          addresses: customerData?.addresses || []
+          name: session.user.user_metadata?.first_name
+            ? `${session.user.user_metadata.first_name} ${session.user.user_metadata.last_name || ''}`.trim()
+            : session.user.email.split('@')[0],
+          phone: customerData?.phone || session.user.user_metadata?.phone || '',
+          customerId: customerData?.id || null,
         });
       }
 
@@ -82,9 +84,11 @@ function App() {
           const { data: customerData } = await supabase.from('customers').select('*').eq('email', session.user.email).single();
           setCurrentUser({
             ...session.user,
-            name: session.user.user_metadata?.first_name ? `${session.user.user_metadata.first_name} ${session.user.user_metadata.last_name}` : session.user.email.split('@')[0],
-            phone: session.user.user_metadata?.phone || '',
-            addresses: customerData?.addresses || []
+            name: session.user.user_metadata?.first_name
+              ? `${session.user.user_metadata.first_name} ${session.user.user_metadata.last_name || ''}`.trim()
+              : session.user.email.split('@')[0],
+            phone: customerData?.phone || session.user.user_metadata?.phone || '',
+            customerId: customerData?.id || null,
           });
         } else {
           setCurrentUser(null);
@@ -93,6 +97,7 @@ function App() {
     };
     initAuth();
   }, []);
+
 
   useEffect(() => {
     const fetchDiscount = async () => {

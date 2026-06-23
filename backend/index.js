@@ -13,6 +13,8 @@ const settingsRoutes = require('./routes/settings');
 const transactionsRoutes = require('./routes/transactions');
 const activityRoutes = require('./routes/activity');
 const testimonialsRoutes = require('./routes/testimonials');
+const addressesRoutes = require('./routes/addresses');
+
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -31,6 +33,8 @@ app.use('/api/settings', settingsRoutes);
 app.use('/api/transactions', transactionsRoutes);
 app.use('/api/activity', activityRoutes);
 app.use('/api/testimonials', testimonialsRoutes);
+app.use('/api/addresses', addressesRoutes);
+
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 

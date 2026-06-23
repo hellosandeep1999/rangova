@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
+import { ProductDetailSkeleton } from './Skeleton';
+
 // Using products passed as prop
+
 
 export default function ProductDetails({ navigateTo, addToCart, selectedProductId, viewProductDetails, products = [] }) {
   // Find active product
@@ -97,7 +100,8 @@ export default function ProductDetails({ navigateTo, addToCart, selectedProductI
   // Simulated original price if none exists to display the attractive crossed-out discount
   const originalPrice = prod.originalPrice || (prod.price ? Math.round(prod.price * 1.35) : 0);
 
-  if (!prod.id) return <div className="p-10 text-center">Loading product...</div>;
+  if (!prod.id) return <ProductDetailSkeleton />;
+
 
   return (
     <div className="pt-6 pb-20 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto text-left font-body-md relative">

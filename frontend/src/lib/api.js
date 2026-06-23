@@ -147,6 +147,50 @@ export async function getOrdersByEmail(email) {
   return res.json();
 }
 
+export async function checkCustomerExists(email) {
+  try {
+    const res = await fetch(`${BASE}/customers/check-email/${encodeURIComponent(email)}`);
+    if (!res.ok) return false;
+    const data = await res.json();
+    return data.exists;
+  } catch {
+    return false;
+  }
+}
+
+// ── ADDRESSES ─────────────────────────────────────────
+export async function getAddresses(email) {
+  const res = await fetch(`${BASE}/addresses/${encodeURIComponent(email)}`);
+  if (!res.ok) return [];
+  return res.json();
+}
+
+export async function createAddress(data) {
+  const res = await fetch(`${BASE}/addresses`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+export async function updateAddress(id, data) {
+  const res = await fetch(`${BASE}/addresses/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+export async function deleteAddress(id) {
+  const res = await fetch(`${BASE}/addresses/${id}`, { method: 'DELETE' });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
 // ── INVENTORY ─────────────────────────────────────────
 export async function getInventory() {
   const res = await fetch(`${BASE}/inventory`, { headers: authHeaders() });

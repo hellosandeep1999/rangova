@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { ProductCardSkeleton } from '../components/Skeleton';
+
 
 export default function Shop({ PRODUCTS, CATEGORIES, navigateTo, addToCart, viewProductDetails, categoryFilter, setCategoryFilter }) {
   const [searchFilter, setSearchFilter] = useState('');
@@ -110,7 +112,13 @@ export default function Shop({ PRODUCTS, CATEGORIES, navigateTo, addToCart, view
             </div>
           </div>
 
-          {filtered.length === 0 ? (
+          {filtered.length === 0 && PRODUCTS.length === 0 ? (
+            // Products still loading — show skeletons
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-8 md:gap-x-6">
+              <ProductCardSkeleton count={6} />
+            </div>
+          ) : filtered.length === 0 ? (
+
             <div className="text-center py-24 space-y-3">
               <span className="material-symbols-outlined text-4xl text-secondary/40">inventory_2</span>
               <p className="font-label-caps text-xs text-secondary uppercase tracking-widest">No products match your filters</p>

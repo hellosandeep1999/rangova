@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { SearchGridSkeleton } from '../components/Skeleton';
+
 
 export default function Search({ navigateTo, addToCart, PRODUCTS, viewProductDetails }) {
   const [query, setQuery] = useState('');
@@ -88,30 +90,35 @@ export default function Search({ navigateTo, addToCart, PRODUCTS, viewProductDet
       {query.trim().length === 0 && (
         <div>
           <span className="font-label-caps text-[10px] text-secondary uppercase tracking-widest mb-5 block">Featured Products</span>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {PRODUCTS.slice(0, 4).map(prod => (
-              <div
-                key={prod.id}
-                onClick={() => viewProductDetails(prod.id)}
-                className="group cursor-pointer text-left"
-              >
-                <div className="relative aspect-[3/4] overflow-hidden mb-2 bg-surface-container-low">
-                  <img alt={prod.title} src={prod.imageMain} className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105" />
-                  <button
-                    onClick={e => { e.stopPropagation(); addToCart(prod, prod.sizes?.[0] || 'S', prod.colors?.[0] || ''); }}
-                    className="absolute bottom-2 right-2 w-8 h-8 bg-primary text-white flex items-center justify-center hover:bg-muted-terracotta transition-colors border-none shadow"
-                    title="Quick Add"
-                  >
-                    <span className="material-symbols-outlined text-[18px]">add</span>
-                  </button>
+          {PRODUCTS.length === 0 ? (
+            <SearchGridSkeleton count={4} />
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {PRODUCTS.slice(0, 4).map(prod => (
+                <div
+                  key={prod.id}
+                  onClick={() => viewProductDetails(prod.id)}
+                  className="group cursor-pointer text-left"
+                >
+                  <div className="relative aspect-[3/4] overflow-hidden mb-2 bg-surface-container-low">
+                    <img alt={prod.title} src={prod.imageMain} className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105" />
+                    <button
+                      onClick={e => { e.stopPropagation(); addToCart(prod, prod.sizes?.[0] || 'S', prod.colors?.[0] || ''); }}
+                      className="absolute bottom-2 right-2 w-8 h-8 bg-primary text-white flex items-center justify-center hover:bg-muted-terracotta transition-colors border-none shadow"
+                      title="Quick Add"
+                    >
+                      <span className="material-symbols-outlined text-[18px]">add</span>
+                    </button>
+                  </div>
+                  <h3 className="font-body-md text-[13px] text-primary leading-tight mb-1">{prod.title}</h3>
+                  <span className="font-price-lg text-[13px] text-primary">₹{prod.price.toLocaleString()}</span>
                 </div>
-                <h3 className="font-body-md text-[13px] text-primary leading-tight mb-1">{prod.title}</h3>
-                <span className="font-price-lg text-[13px] text-primary">₹{prod.price.toLocaleString()}</span>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
+
 
       {/* Search Results */}
       {query.trim().length > 0 && (

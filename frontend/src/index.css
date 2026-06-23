@@ -96,19 +96,29 @@ body {
   transform: translateY(0);
 }
 
-/* Team Working Reels — infinite horizontal marquee */
-@keyframes marqueeScroll {
+/* Infinite horizontal marquee — text scrolls right-to-left seamlessly */
+@keyframes marqueeInfinite {
   0%   { transform: translateX(0); }
   100% { transform: translateX(-50%); }
 }
-
-@keyframes marqueeInfinite {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
-}
 .animate-marquee {
-  animation: marqueeInfinite 20s linear infinite;
+  display: flex;
+  width: max-content;
+  animation: marqueeInfinite 22s linear infinite;
+  will-change: transform;
 }
-.pl-full {
-  padding-left: 100%;
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* Shimmer skeleton loading animation */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, #ede9e2 25%, #f5f2ec 50%, #ede9e2 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: 2px;
 }

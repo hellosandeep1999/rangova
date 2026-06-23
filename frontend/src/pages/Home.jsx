@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { getSetting, getTestimonials } from '../lib/api';
+import { HeroSkeleton, CategoryCardSkeleton, ProductCardSkeleton, TestimonialSkeleton } from '../components/Skeleton';
+
 
 const HERO_SLIDES = [
   {
@@ -42,11 +44,13 @@ const TESTIMONIALS = [
 
 export default function Home({ navigateTo, setCategoryFilter, addToCart, PRODUCTS, CATEGORIES, viewProductDetails }) {
   const [heroSlides, setHeroSlides] = useState([]);
-  const [testimonials, setTestimonials] = useState(TESTIMONIALS);
+  const [testimonials, setTestimonials] = useState([]);
   const [fashionReels, setFashionReels] = useState([]);
   const [teamReels, setTeamReels] = useState([]);
   const [brandOverlay, setBrandOverlay] = useState(HERO_SLIDES[0].img);
   const [heroIdx, setHeroIdx] = useState(0);
+  const [loading, setLoading] = useState(true);
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -83,6 +87,10 @@ export default function Home({ navigateTo, setCategoryFilter, addToCart, PRODUCT
         if (overlayData) setBrandOverlay(overlayData);
       } catch (err) {
         console.error('Error fetching home data:', err);
+        setHeroSlides(HERO_SLIDES);
+        setTestimonials(TESTIMONIALS);
+      } finally {
+        setLoading(false);
       }
     };
     fetchData();
@@ -169,11 +177,12 @@ export default function Home({ navigateTo, setCategoryFilter, addToCart, PRODUCT
           className="flex w-full h-full overflow-x-auto snap-x snap-mandatory no-scrollbar"
           style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-x' }}
         >
-          {heroSlides.length === 0 ? (
-            <div className="w-full h-full flex items-center justify-center">
-              <span className="material-symbols-outlined animate-spin text-secondary">sync</span>
+          {loading || heroSlides.length === 0 ? (
+            <div className="w-full h-full flex-shrink-0">
+              <HeroSkeleton />
             </div>
           ) : heroSlides.map((slide, i) => (
+
             <div
               key={i}
               className="relative w-full h-full flex-shrink-0 snap-center snap-always"
@@ -228,7 +237,10 @@ export default function Home({ navigateTo, setCategoryFilter, addToCart, PRODUCT
           className="flex gap-5 md:gap-7 overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory px-margin-mobile md:px-margin-desktop pb-10"
           style={{ WebkitOverflowScrolling: 'touch' }}
         >
-          {CATEGORIES && CATEGORIES.map((cat, i) => (
+          {(!CATEGORIES || CATEGORIES.length === 0) ? (
+            <CategoryCardSkeleton count={5} />
+          ) : CATEGORIES.map((cat, i) => (
+
             <button
               key={i}
               onClick={() => { setCategoryFilter(cat.name); navigateTo('shop'); }}
@@ -271,7 +283,10 @@ export default function Home({ navigateTo, setCategoryFilter, addToCart, PRODUCT
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
-            {PRODUCTS.slice(0, 10).map((prod) => (
+            {PRODUCTS.length === 0 ? (
+              <ProductCardSkeleton count={6} />
+            ) : PRODUCTS.slice(0, 10).map((prod) => (
+
               <div
                 key={prod.id}
                 onClick={() => {
@@ -427,7 +442,10 @@ export default function Home({ navigateTo, setCategoryFilter, addToCart, PRODUCT
           className="flex gap-4 md:gap-5 overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory px-margin-mobile md:px-margin-desktop pb-4"
           style={{ WebkitOverflowScrolling: 'touch' }}
         >
-          {testimonials.map((t, i) => (
+          {loading ? (
+            <TestimonialSkeleton count={2} />
+          ) : testimonials.map((t, i) => (
+
             <div key={i} className="flex-shrink-0 snap-start" style={{ width: 'min(88vw, 460px)' }}>
               <div className="bg-warm-ivory border border-outline-variant/20 rounded-[15px] flex flex-col gap-4 p-4 overflow-hidden h-full">
                 {/* Image row - horizontal on all screens */}

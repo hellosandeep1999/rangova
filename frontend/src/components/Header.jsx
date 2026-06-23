@@ -25,16 +25,12 @@ export default function Header({
     <>
       {discount && Array.isArray(discount) && discount.length > 0 && (
         <div className="bg-primary text-white text-[10px] font-label-caps uppercase tracking-widest py-2 w-full relative z-[60] overflow-hidden">
-          <div className="whitespace-nowrap animate-marquee flex items-center gap-12 pl-full">
-            {discount.map((d, idx) => (
-              <span key={d.id || idx} className="inline-block">
-                USE CODE <span className="font-bold text-muted-terracotta">{d.code}</span> FOR {d.percent}% OFF
-              </span>
-            ))}
-            {/* Duplicate for seamless infinite scrolling */}
-            {discount.map((d, idx) => (
-              <span key={`dup-${d.id || idx}`} className="inline-block">
-                USE CODE <span className="font-bold text-muted-terracotta">{d.code}</span> FOR {d.percent}% OFF
+          <div className="animate-marquee gap-16">
+            {/* First copy */}
+            {[...discount, ...discount, ...discount, ...discount].map((d, idx) => (
+              <span key={`a-${idx}`} className="inline-block px-8 flex-shrink-0">
+                USE CODE <span className="font-bold text-dusty-gold">{d.code}</span> FOR {d.percent}% OFF
+                <span className="mx-8 opacity-40">✦</span>
               </span>
             ))}
           </div>
